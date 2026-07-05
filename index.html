@@ -4,529 +4,722 @@
   <meta charset="UTF-8" />
   <title>Wildlife Documentary Engine</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
     :root {
-      --bg: #0a0e17;
-      --surface: #111827;
-      --surface2: #161e2d;
-      --border: #1e2d45;
-      --border-soft: #25324a;
-      --text: #e4ebf5;
-      --text-muted: #8896ab;
-      --text-dim: #5c6b82;
-      --orange: #f08a4b;
-      --orange-soft: #f08a4b22;
-      --orange-glow: #f08a4b40;
-      --green: #4ade80;
-      --red: #f87171;
-      --red-soft: #f8717122;
-      --radius: 12px;
-      --radius-sm: 8px;
-      --sidebar-w: 370px;
-      --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --bg: #07090D;
+      --sidebar: #0B0F17;
+      --panel: #101722;
+      --panel-2: #151D2A;
+      --panel-3: #0D131D;
+      --border: #202A3A;
+      --border-soft: #182132;
+      --text: #F3F6FA;
+      --muted: #8B98AA;
+      --dim: #5E6B7D;
+      --accent: #E7A15B;
+      --accent-soft: #E7A15B1A;
+      --success: #48D597;
+      --danger: #F87171;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --sidebar-w: 340px;
+      --font: Inter, Geist, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      font-family: var(--font);
-      background: linear-gradient(135deg, #080c14 0%, #0d1320 50%, #0a101b 100%);
-      color: var(--text);
-      display: flex;
       min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      display: flex;
     }
 
-    /* SIDEBAR */
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
     aside {
       width: var(--sidebar-w);
       min-width: var(--sidebar-w);
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
+      height: 100vh;
       position: sticky;
       top: 0;
-      height: 100vh;
+      overflow-y: auto;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border-soft);
+      padding: 24px;
     }
 
-    aside h1 {
-      font-size: 20px;
+    main {
+      flex: 1;
+      min-width: 0;
+      padding: 28px;
+      overflow-y: auto;
+    }
+
+    .brand {
+      margin-bottom: 24px;
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
       font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text);
+      margin-bottom: 8px;
     }
 
-    aside h1 span { color: var(--orange); }
+    .brand h1 span {
+      color: var(--accent);
+    }
 
-    aside .desc {
+    .brand p {
+      color: var(--muted);
       font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.5;
-      margin-bottom: 4px;
+      line-height: 1.55;
     }
 
-    .section-label {
+    .sidebar-section {
+      margin-bottom: 22px;
+    }
+
+    .section-title {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-dim);
-      margin-top: 8px;
+      color: var(--dim);
+      margin-bottom: 12px;
+    }
+
+    .field {
+      margin-bottom: 14px;
     }
 
     label {
-      font-size: 13px;
+      display: block;
+      font-size: 12px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--muted);
+      margin-bottom: 7px;
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       width: 100%;
-      background: var(--surface2);
+      color: var(--text);
+      background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      color: var(--text);
-      padding: 10px 12px;
-      font-size: 13px;
-      font-family: var(--font);
-      transition: border-color 0.15s;
-    }
-
-    input:focus, select:focus, textarea:focus {
+      padding: 10px 11px;
       outline: none;
-      border-color: var(--orange);
-      box-shadow: 0 0 0 3px var(--orange-soft);
     }
 
-    textarea { min-height: 68px; resize: vertical; }
+    textarea {
+      min-height: 78px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    #jsonInput {
+      min-height: 130px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+    }
 
     .btn {
-      display: block;
       width: 100%;
-      padding: 11px 16px;
-      border: none;
+      border: 1px solid transparent;
       border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 600;
+      padding: 10px 12px;
       cursor: pointer;
-      transition: all 0.15s;
-      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 650;
+      transition: 0.15s ease;
     }
 
     .btn-primary {
-      background: var(--orange);
-      color: #0a0e17;
+      background: var(--accent);
+      color: #090B10;
     }
-    .btn-primary:hover { background: #f5995b; }
+
+    .btn-primary:hover {
+      filter: brightness(1.06);
+    }
 
     .btn-secondary {
-      background: var(--surface2);
+      background: var(--panel);
       color: var(--text);
-      border: 1px solid var(--border);
+      border-color: var(--border);
     }
-    .btn-secondary:hover { background: #1c2638; }
 
-    .btn-sm {
-      font-size: 11px;
-      padding: 5px 10px;
-      width: auto;
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--text);
     }
 
     .btn-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
-    }
-    .btn-row .btn { flex: 1; }
-
-    /* MAIN */
-    main {
-      flex: 1;
-      padding: 28px 32px;
-      overflow-y: auto;
+      margin-bottom: 8px;
     }
 
-    /* STATUS BAR */
     .status-bar {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 16px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      color: var(--muted);
     }
+
     .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--dim);
       flex-shrink: 0;
     }
-    .status-dot.ready  { background: var(--text-dim); }
-    .status-dot.active { background: var(--orange); box-shadow: 0 0 6px var(--orange-glow); }
-    .status-dot.loaded { background: var(--green); box-shadow: 0 0 6px #4ade8040; }
-    .status-dot.error  { background: var(--red); }
 
-    /* EMPTY STATE */
+    .status-dot.ready { background: var(--dim); }
+    .status-dot.active { background: var(--accent); }
+    .status-dot.loaded { background: var(--success); }
+    .status-dot.error { background: var(--danger); }
+
+    .auto-preview-status {
+      display: none;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      color: var(--muted);
+    }
+
     .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 40px;
-      text-align: center;
+      min-height: 360px;
       border: 1px dashed var(--border);
       border-radius: var(--radius);
-      color: var(--text-dim);
-      min-height: 300px;
-    }
-    .empty-state .icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: 0.4;
-    }
-    .empty-state p { font-size: 15px; max-width: 360px; line-height: 1.6; }
-    .empty-state .hint {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 12px;
-    }
-
-    /* CARDS */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border-soft);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-bottom: 16px;
-    }
-    .card h2 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--orange);
-      margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      text-align: center;
+      color: var(--dim);
+      padding: 40px;
     }
-    .card h3 {
-      font-size: 14px;
-      font-weight: 600;
+
+    .empty-state-content {
+      max-width: 420px;
+    }
+
+    .empty-state h2 {
+      font-size: 18px;
       color: var(--text);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
-    /* BADGES */
-    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
+    .empty-state p {
+      color: var(--muted);
+      line-height: 1.6;
     }
-    .badge.orange { background: var(--orange-soft); border-color: var(--orange-glow); color: var(--orange); }
 
-    /* SCENE CARDS */
-    .scene-card {
-      background: var(--surface2);
+    .card {
+      background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px 20px;
-      margin-bottom: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+      min-width: 0;
     }
-    .scene-header {
+
+    .card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .scene-number {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--orange);
-    }
-    .scene-duration {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-dim);
-    }
-    .scene-field {
-      margin-bottom: 10px;
-    }
-    .scene-field .field-label {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-dim);
-      margin-bottom: 3px;
-    }
-    .scene-field .field-value {
-      font-size: 13px;
-      color: var(--text);
-      line-height: 1.5;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
-    /* PROMPT BLOCKS */
-    .prompt-block {
-      background: #0a0f1a;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      position: relative;
-    }
-    .prompt-block pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      font-size: 12px;
-      color: #cbd5e1;
-      line-height: 1.6;
-      font-family: var(--font);
-      margin: 0;
-      max-height: 120px;
-      overflow-y: auto;
-    }
-    .prompt-block .prompt-label {
-      font-size: 10px;
+    .card h2 {
+      font-size: 14px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--orange);
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .card h3 {
+      font-size: 16px;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
       margin-bottom: 6px;
     }
-    .copy-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--text-muted);
-      font-size: 11px;
-      padding: 3px 8px;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-family: var(--font);
-    }
-    .copy-btn:hover { color: var(--text); border-color: var(--orange); }
-    .copy-btn.copied { color: var(--green); border-color: var(--green); }
 
-    /* HASHTAGS */
-    .hashtags {
+    .card p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .overview-title {
+      font-size: 24px;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .overview-logline {
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 920px;
+    }
+
+    .badge-row {
       display: flex;
       flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
       gap: 6px;
-      margin-top: 6px;
-    }
-    .hashtag {
-      font-size: 12px;
-      font-weight: 500;
-      color: #7fb4e0;
-    }
-
-    /* ERROR */
-    .error-box {
-      background: var(--red-soft);
-      border: 1px solid var(--red);
-      border-radius: var(--radius-sm);
-      padding: 14px 18px;
-      margin-bottom: 16px;
-      color: #fca5a5;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    .error-box strong { color: var(--red); }
-    .error-box ul { margin: 8px 0 0 18px; }
-    .error-box li { margin-bottom: 4px; }
-
-    /* RESPONSIVE */
-    @media (max-width: 860px) {
-      body { flex-direction: column; }
-      aside {
-        width: 100%; min-width: 100%; max-width: 100%;
-        position: static;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
-      main { padding: 20px; }
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 650;
     }
 
-    /* 2-COLUMN PREVIEW GRID */
+    .badge.accent {
+      background: var(--accent-soft);
+      border-color: #3B3024;
+      color: var(--accent);
+    }
+
     .preview-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 16px;
-      margin-bottom: 16px;
     }
-    .preview-col {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+
+    .preview-column {
       min-width: 0;
     }
-    .full-width { grid-column: 1 / -1; }
 
-    /* PROMPT GRID (image/video side by side) */
-    .prompt-grid {
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .qa-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .qa-tile {
+      background: var(--panel-2);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+
+    .qa-value {
+      font-size: 20px;
+      font-weight: 750;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .qa-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--dim);
+      font-weight: 700;
+    }
+
+    .notes-list {
+      margin-top: 12px;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .notes-list li {
+      margin-bottom: 6px;
+    }
+
+    .script-line {
+      border-bottom: 1px solid var(--border-soft);
+      padding: 10px 0;
+    }
+
+    .script-line:first-child {
+      padding-top: 0;
+    }
+
+    .script-line:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .script-meta {
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 5px;
+    }
+
+    .script-text {
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .storyboard-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
     }
-    .prompt-grid .prompt-block { margin-bottom: 0; }
 
-    /* VO SCRIPT */
-    .vo-scene {
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border-soft);
+    .storyboard-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      min-width: 0;
     }
-    .vo-scene:last-child { border-bottom: none; }
-    .vo-scene .vo-scene-header {
+
+    .storyboard-card-title {
+      color: var(--accent);
       font-size: 11px;
-      font-weight: 700;
-      color: var(--orange);
+      font-weight: 750;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 4px;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
     }
-    .vo-scene .vo-scene-text {
-      font-size: 13px;
+
+    .storyboard-card p {
+      font-size: 12px;
+      line-height: 1.55;
+      margin-bottom: 6px;
+    }
+
+    .storyboard-card strong {
+      color: var(--dim);
+      font-weight: 700;
+    }
+
+    .prompt-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .prompt-scene {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .prompt-scene-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .prompt-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .prompt-block {
+      background: var(--panel-3);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      position: relative;
+      min-width: 0;
+    }
+
+    .prompt-label {
+      font-size: 10px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--dim);
+      margin-bottom: 8px;
+      padding-right: 55px;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
       color: var(--text);
+      line-height: 1.6;
+      font-size: 12.5px;
+      font-family: var(--font);
+      max-height: 210px;
+      overflow-y: auto;
+    }
+
+    .copy-btn {
+      background: var(--panel-2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 650;
+      cursor: pointer;
+      transition: 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .copy-btn.copied {
+      color: var(--success);
+      border-color: var(--success);
+    }
+
+    .copy-absolute {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+    }
+
+    .negative-block {
+      margin-top: 10px;
+      background: #0B1018;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      position: relative;
+    }
+
+    .negative-block pre {
+      color: var(--muted);
+      max-height: 100px;
+    }
+
+    .social-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    .title-options {
+      margin-top: 12px;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .title-options li {
+      margin-bottom: 6px;
+    }
+
+    .error-box {
+      background: #1D1012;
+      border: 1px solid #4B1F25;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      color: #FCA5A5;
+      margin-bottom: 16px;
       line-height: 1.6;
     }
 
-    /* STORYBOARD PANEL */
-    .storyboard-scene {
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border-soft);
-    }
-    .storyboard-scene:last-child { border-bottom: none; }
-    .storyboard-scene .sb-header {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--orange);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 4px;
-    }
-    .storyboard-scene .sb-detail {
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-    .storyboard-scene .sb-detail span {
-      color: var(--text-dim);
-      font-weight: 600;
+    .error-box strong {
+      color: var(--danger);
     }
 
-    /* QA SCORE */
-    .qa-placeholder {
-      color: var(--text-dim);
-      font-style: italic;
-      font-size: 13px;
-      padding: 8px 0;
+    .error-box ul {
+      margin-top: 8px;
+      padding-left: 18px;
     }
-    .qa-metrics {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
-    }
-    .qa-metric {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-      text-align: center;
-    }
-    .qa-metric .qa-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--orange);
-    }
-    .qa-metric .qa-label {
-      font-size: 10px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-top: 2px;
+      margin-bottom: 14px;
     }
 
-    /* COMPACT CARD */
-    .card.compact { padding: 16px 20px; }
+    @media (max-width: 980px) {
+      body {
+        display: block;
+      }
 
-    /* RESPONSIVE OVERRIDES */
-    @media (max-width: 860px) {
-      .preview-grid { grid-template-columns: 1fr; }
-      .prompt-grid { grid-template-columns: 1fr; }
-      .qa-metrics { grid-template-columns: 1fr 1fr; }
+      aside {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--border-soft);
+      }
+
+      main {
+        padding: 20px;
+      }
+
+      .preview-grid,
+      .prompt-row,
+      .storyboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .qa-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      main,
+      aside {
+        padding: 16px;
+      }
+
+      .btn-row {
+        grid-template-columns: 1fr;
+      }
+
+      .qa-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
+
 <body>
   <aside>
-    <h1>Wildlife<span> Documentary</span> Engine</h1>
-    <p class="desc">AI-powered cinematic wildlife episode packaging. Build once, render everywhere.</p>
-
-    <div class="section-label">Configuration</div>
-
-    <label for="animalInput">Animal / Topic</label>
-    <input id="animalInput" placeholder="e.g. aye-aye, harpy eagle, marine iguana" />
-
-    <label for="episodeType">Episode Type</label>
-    <select id="episodeType">
-      <option value="auto">Auto-pick strongest structure</option>
-      <option value="strange_hunting_method">Strange Hunting Method</option>
-      <option value="impossible_survival">Impossible Survival</option>
-      <option value="silent_predator">Silent Predator</option>
-      <option value="bizarre_body_tool">Bizarre Body Tool</option>
-      <option value="extreme_evolution_trick">Extreme Evolution Trick</option>
-    </select>
-
-    <label for="length">Length</label>
-    <select id="length">
-      <option value="30-40 seconds">30-40 seconds</option>
-      <option value="45-60 seconds" selected>45-60 seconds</option>
-      <option value="60-90 seconds">60-90 seconds</option>
-    </select>
-
-    <label for="visualStyle">Visual Style</label>
-    <textarea id="visualStyle">cinematic viral wildlife documentary, vertical 9:16, macro animal footage, natural habitat realism, shallow depth of field, dramatic documentary lighting</textarea>
-
-    <label for="extraRequirements">Extra Requirements</label>
-    <textarea id="extraRequirements" placeholder="e.g. no gore, safe for students"></textarea>
-
-    <button class="btn btn-primary" onclick="createGptPrompt()">Create GPT Prompt</button>
-
-    <div class="section-label">Generated JSON</div>
-
-    <label for="jsonInput">Paste JSON from Custom GPT</label>
-    <textarea id="jsonInput" placeholder="Paste the JSON output from your Wildlife Documentary Engine Custom GPT..."></textarea>
-
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="previewJson()">Preview JSON</button>
-      <button class="btn btn-secondary" onclick="loadSampleJson()">Load Sample</button>
+    <div class="brand">
+      <h1>Wildlife <span>Documentary</span> Engine</h1>
+      <p>Generate, save, preview, and export cinematic wildlife documentary packages.</p>
     </div>
-    <button class="btn btn-secondary" onclick="clearJson()">Clear JSON</button>
 
-    <div class="section-label">Auto Preview</div>
+    <div class="sidebar-section">
+      <div class="section-title">Configuration</div>
 
-    <div class="btn-row">
-      <button id="autoPreviewBtn" class="btn btn-secondary" onclick="startAutoPreview()">Start Auto Preview</button>
-      <button class="btn btn-secondary" onclick="loadLatestPackage()">Load Latest</button>
+      <div class="field">
+        <label for="animalInput">Animal / Topic</label>
+        <input id="animalInput" placeholder="e.g. aye-aye, harpy eagle, star-nosed mole" />
+      </div>
+
+      <div class="field">
+        <label for="episodeType">Episode Type</label>
+        <select id="episodeType">
+          <option value="auto">Auto-pick strongest structure</option>
+          <option value="strange_hunting_method">Strange Hunting Method</option>
+          <option value="impossible_survival">Impossible Survival</option>
+          <option value="silent_predator">Silent Predator</option>
+          <option value="bizarre_body_tool">Bizarre Body Tool</option>
+          <option value="extreme_evolution_trick">Extreme Evolution Trick</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="length">Length</label>
+        <select id="length">
+          <option value="30-40 seconds">30-40 seconds</option>
+          <option value="45-60 seconds" selected>45-60 seconds</option>
+          <option value="60-90 seconds">60-90 seconds</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="visualStyle">Visual Style</label>
+        <textarea id="visualStyle">cinematic viral wildlife documentary, vertical 9:16, macro animal footage, natural habitat realism, shallow depth of field, dramatic documentary lighting</textarea>
+      </div>
+
+      <div class="field">
+        <label for="extraRequirements">Extra Requirements</label>
+        <textarea id="extraRequirements" placeholder="e.g. no gore, safe for students"></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="createGptPrompt()">Create GPT Prompt</button>
     </div>
-    <button class="btn btn-secondary" onclick="savePastedJson()">Save Pasted JSON</button>
+
+    <div class="sidebar-section">
+      <div class="section-title">Generated JSON</div>
+
+      <div class="field">
+        <label for="jsonInput">Paste JSON from Custom GPT</label>
+        <textarea id="jsonInput" placeholder="Paste the JSON output from your Wildlife Documentary Engine Custom GPT..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="previewJson()">Preview JSON</button>
+        <button class="btn btn-secondary" onclick="loadSampleJson()">Load Sample</button>
+      </div>
+
+      <button class="btn btn-secondary" onclick="clearJson()">Clear JSON</button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-title">Auto Preview</div>
+
+      <div class="btn-row">
+        <button id="autoPreviewBtn" class="btn btn-secondary" onclick="toggleAutoPreview()">Start Auto Preview</button>
+        <button class="btn btn-secondary" onclick="loadLatestPackage()">Load Latest</button>
+      </div>
+
+      <button class="btn btn-secondary" onclick="savePastedJson()">Save Pasted JSON</button>
+    </div>
   </aside>
 
   <main>
@@ -535,18 +728,23 @@
       <span id="statusText">Ready</span>
     </div>
 
-    <div id="autoPreviewStatus" style="display:none;padding:8px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);">
+    <div id="autoPreviewStatus" class="auto-preview-status">
       Auto Preview: <span id="autoPreviewMsg">Waiting for Custom GPT output...</span>
     </div>
 
     <div id="output" class="empty-state">
-      <div class="icon">🎬</div>
-      <p>Create a GPT prompt or load a Wildlife Documentary JSON package to preview it here.</p>
-      <p class="hint">Step 1: Configure &rarr; Step 2: Copy prompt to Custom GPT &rarr; Step 3: Paste JSON &rarr; Step 4: Preview</p>
+      <div class="empty-state-content">
+        <h2>No package loaded</h2>
+        <p>Create a GPT prompt, paste a JSON package, or start Auto Preview to load the latest saved package.</p>
+      </div>
     </div>
   </main>
 
   <script>
+    let autoPreviewTimer = null;
+    let currentPackageId = null;
+    let lastRenderedPackage = null;
+
     function escapeHtml(value) {
       return String(value ?? "")
         .replaceAll("&", "&amp;")
@@ -556,238 +754,457 @@
         .replaceAll("'", "&#039;");
     }
 
+    function copyText(button, text) {
+      const value = text ?? button?.dataset?.copyText ?? "";
+      if (!value) return;
 
-    function copyText(el, text) {
-      if (text === undefined) {
-        if (el && el.dataset.copyText !== undefined) {
-          text = el.dataset.copyText;
-        } else {
-          const container = el.closest(".prompt-block") || el.closest(".card") || el.closest("section");
-          const elm = container && (container.querySelector("pre") || container.querySelector("p"));
-          text = elm ? elm.textContent : "";
-        }
-      }
-      if (!navigator.clipboard) {
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.style.position = "fixed"; ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(value);
       } else {
-        navigator.clipboard.writeText(text);
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
       }
-      if (el) {
-        const original = el.textContent;
-        const label = el.dataset.copyLabel || "";
-        el.classList.add("copied");
-        el.textContent = label ? "Copied " + label + "!" : "Copied!";
-        setTimeout(() => { el.classList.remove("copied"); el.textContent = original; }, 1500);
+
+      if (button) {
+        const original = button.textContent;
+        button.classList.add("copied");
+        button.textContent = "Copied";
+        setTimeout(() => {
+          button.classList.remove("copied");
+          button.textContent = original;
+        }, 1200);
       }
     }
 
     function setStatus(state, text) {
       const dot = document.querySelector(".status-dot");
-      const txt = document.getElementById("statusText");
+      const label = document.getElementById("statusText");
       dot.className = "status-dot " + state;
-      txt.textContent = text;
+      label.textContent = text;
     }
 
     function showError(message) {
       document.getElementById("output").className = "";
-      document.getElementById("output").innerHTML = '<div class="error-box">' + message + '</div>';
+      document.getElementById("output").innerHTML = `<div class="error-box">${message}</div>`;
       setStatus("error", "Error");
+    }
+
+    function isV2(pkg) {
+      return pkg && pkg.schema_version === "2.0";
+    }
+
+    function normalizePackage(pkg) {
+      if (isV2(pkg)) return pkg;
+
+      const scenes = Array.isArray(pkg.scenes) ? pkg.scenes : [];
+      const meta = pkg.metadata || {};
+
+      return {
+        schema_version: "2.0",
+        episode_overview: {
+          episode_title: pkg.episode_title || pkg.title || "Untitled Episode",
+          animal: pkg.animal || "",
+          episode_type: pkg.episode_type || "auto",
+          runtime: pkg.runtime || "",
+          tone: meta.tone || "",
+          format: meta.format || "",
+          visual_style: meta.style || "",
+          target_platform: meta.target_platform || "",
+          logline: pkg.summary || ""
+        },
+        hook: {
+          hook_line: pkg.hook || "",
+          curiosity_gap: "",
+          payoff_setup: ""
+        },
+        summary: {
+          short_summary: pkg.summary || "",
+          full_summary: pkg.summary || ""
+        },
+        qa_score: {
+          overall_score: 0,
+          hook_score: 0,
+          structure_score: 0,
+          visual_score: 0,
+          factuality_score: 0,
+          pacing_score: 0,
+          notes: ["Legacy v1 package converted for preview only."]
+        },
+        vo_script: {
+          full_script: scenes.map(s => s.narration || "").filter(Boolean).join("\n\n"),
+          lines: scenes.map(s => ({
+            scene_number: s.scene_number || s.scene || 0,
+            timestamp: "",
+            duration: s.duration || "",
+            voiceover: s.narration || ""
+          }))
+        },
+        storyboard: {
+          storyboard_copy_prompt: "",
+          panels: scenes.map(s => ({
+            panel_number: s.scene_number || s.scene || 0,
+            duration: s.duration || "",
+            visual_beat: s.image_prompt || s.visual || "",
+            subject_action: "",
+            environment: "",
+            camera_style: s.camera_style || s.camera || "",
+            lighting: "",
+            composition: "",
+            consistency_notes: ""
+          }))
+        },
+        image_video_prompts: scenes.map(s => ({
+          scene_number: s.scene_number || s.scene || 0,
+          duration: s.duration || "",
+          image_prompt: s.image_prompt || "",
+          video_prompt: s.video_prompt || "",
+          negative_prompt: "no humans, no text, no watermark, no logo, no gore"
+        })),
+        thumbnail_prompt: {
+          prompt: pkg.thumbnail_prompt || "",
+          negative_prompt: "no text, no watermark, no logo"
+        },
+        social_export: {
+          caption: pkg.caption || "",
+          hashtags: Array.isArray(pkg.hashtags) ? pkg.hashtags : [],
+          title_options: [],
+          description: pkg.summary || "",
+          keywords: []
+        }
+      };
     }
 
     function validatePackage(pkg) {
       const missing = [];
-      const requiredTop = ["episode_title","animal","hook","summary","runtime","scenes","thumbnail_prompt","caption","hashtags","metadata"];
-      for (const key of requiredTop) {
-        if (!(key in pkg) || pkg[key] === null || pkg[key] === undefined || (typeof pkg[key] === "string" && pkg[key].trim() === "" && key !== "hashtags")) {
-          missing.push("Top-level: " + key);
-        }
+      const required = [
+        "schema_version",
+        "episode_overview",
+        "hook",
+        "summary",
+        "qa_score",
+        "vo_script",
+        "storyboard",
+        "image_video_prompts",
+        "thumbnail_prompt",
+        "social_export"
+      ];
+
+      required.forEach(key => {
+        if (!(key in pkg)) missing.push("Top-level: " + key);
+      });
+
+      if (pkg.schema_version !== "2.0") {
+        missing.push("schema_version must be 2.0");
       }
-      if (pkg.scenes && !Array.isArray(pkg.scenes)) {
-        missing.push("scenes must be an array");
-      } else if (Array.isArray(pkg.scenes)) {
-        if (pkg.scenes.length === 0) missing.push("scenes must have at least 1 entry");
-        pkg.scenes.forEach((scene, i) => {
-          const req = ["scene_number","duration","narration","image_prompt","video_prompt"];
-          for (const key of req) {
-            if (!(key in scene) || scene[key] === null || scene[key] === undefined) {
-              missing.push("scenes[" + i + "]." + key);
-            }
-          }
-        });
+
+      if (!Array.isArray(pkg.image_video_prompts)) {
+        missing.push("image_video_prompts must be an array");
       }
-      if (pkg.metadata && typeof pkg.metadata === "object") {
-        ["tone","format","style","target_platform"].forEach(key => {
-          if (!(key in pkg.metadata) || pkg.metadata[key] === null || pkg.metadata[key] === undefined) {
-            missing.push("metadata." + key);
-          }
-        });
+
+      if (!Array.isArray(pkg.vo_script?.lines)) {
+        missing.push("vo_script.lines must be an array");
       }
-      if (pkg.hashtags && !Array.isArray(pkg.hashtags)) {
-        missing.push("hashtags must be an array");
+
+      if (!Array.isArray(pkg.storyboard?.panels)) {
+        missing.push("storyboard.panels must be an array");
       }
+
       return missing;
     }
 
     function renderMissingFields(missing) {
-      if (missing.length === 0) return "";
-      return '<div class="error-box"><strong>Validation Warning — missing fields:</strong><ul>'
-        + missing.map(m => '<li>' + escapeHtml(m) + '</li>').join("")
-        + '</ul><p style="margin-top:8px;font-size:12px;color:#fca5a5;">Preview rendered anyway. Correct these fields in the Custom GPT for full compliance.</p></div>';
+      if (!missing.length) return "";
+
+      return `
+        <div class="error-box">
+          <strong>Validation Warning</strong>
+          <ul>
+            ${missing.map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+          </ul>
+        </div>
+      `;
     }
 
-    function renderPackage(pkg) {
-      const missing = validatePackage(pkg);
-      const warnHtml = renderMissingFields(missing);
-      const scenes = pkg.scenes || [];
-      const meta = pkg.metadata || {};
-      const hashtags = pkg.hashtags || [];
-      const qa = pkg.qa || null;
-      const episodeTitle = pkg.episode_title || "Untitled";
+    function buildStoryboardCopyPrompt(pkg) {
+      if (pkg.storyboard?.storyboard_copy_prompt) {
+        return pkg.storyboard.storyboard_copy_prompt;
+      }
 
-      // Build VO Script text
-      const voScriptText = scenes.map(s =>
-        "Scene " + (s.scene_number || "?") + " \u2014 " + (s.duration || "?") + "\n" + (s.narration || "")
-      ).join("\n\n");
+      const overview = pkg.episode_overview || {};
+      const panels = pkg.storyboard?.panels || [];
 
-      // Build Storyboard prompt
-      const storyboardPrompt = [
-        "Create a clean cinematic storyboard sheet for " + episodeTitle + ", vertical wildlife documentary style, consistent subject, consistent visual style.",
-        ""
-      ].concat(scenes.map((s, i) =>
-        "Panel " + (i + 1) + ":\n" + (s.image_prompt || "") + "\nCamera: " + (s.camera_style || "cinematic")
-      )).concat([
+      return [
+        `Create a clean cinematic storyboard sheet for "${overview.episode_title || "Wildlife Documentary"}".`,
+        `Style: ${overview.visual_style || "cinematic wildlife documentary, natural habitat realism"}.`,
+        `Subject: ${overview.animal || "wildlife subject"}.`,
+        "",
+        ...panels.map(panel => [
+          `Panel ${panel.panel_number}:`,
+          `Visual beat: ${panel.visual_beat || ""}`,
+          `Action: ${panel.subject_action || ""}`,
+          `Environment: ${panel.environment || ""}`,
+          `Camera: ${panel.camera_style || ""}`,
+          `Lighting: ${panel.lighting || ""}`,
+          `Composition: ${panel.composition || ""}`,
+          `Consistency: ${panel.consistency_notes || ""}`
+        ].join("\n")),
         "",
         "Design rules:",
-        "- consistent animal appearance",
-        "- consistent habitat",
-        "- no humans",
-        "- no text overlays unless required",
-        "- clean panel borders",
-        "- professional documentary storyboard layout"
-      ]).join("\n");
+        "- consistent animal appearance across every panel",
+        "- consistent habitat and lighting",
+        "- clean storyboard panel borders",
+        "- professional documentary composition",
+        "- no humans unless required",
+        "- no text overlays, no logos, no watermarks"
+      ].join("\n\n");
+    }
 
-      // Build social export combined text
-      const hashtagsText = hashtags.join(" ");
-      const socialExportText = (pkg.caption || "") + "\n\n" + hashtagsText;
+    function buildSocialExportText(pkg) {
+      const social = pkg.social_export || {};
+      return [
+        social.caption || "",
+        "",
+        Array.isArray(social.hashtags) ? social.hashtags.join(" ") : "",
+        "",
+        social.description || ""
+      ].filter(Boolean).join("\n");
+    }
+
+    function renderPackage(rawPkg) {
+      const pkg = normalizePackage(rawPkg);
+      lastRenderedPackage = pkg;
+
+      const missing = validatePackage(pkg);
+      const overview = pkg.episode_overview || {};
+      const hook = pkg.hook || {};
+      const summary = pkg.summary || {};
+      const qa = pkg.qa_score || {};
+      const vo = pkg.vo_script || {};
+      const storyboard = pkg.storyboard || {};
+      const panels = Array.isArray(storyboard.panels) ? storyboard.panels : [];
+      const prompts = Array.isArray(pkg.image_video_prompts) ? pkg.image_video_prompts : [];
+      const thumbnail = pkg.thumbnail_prompt || {};
+      const social = pkg.social_export || {};
+      const storyboardCopyPrompt = buildStoryboardCopyPrompt(pkg);
+      const socialExportText = buildSocialExportText(pkg);
+
+      const fullJsonText = JSON.stringify(pkg, null, 2);
+      const fullScriptText = vo.full_script || (vo.lines || []).map(line => line.voiceover).join("\n\n");
+      const allImagePrompts = prompts.map(p => `Scene ${p.scene_number} — ${p.duration}\n${p.image_prompt}`).join("\n\n");
+      const allVideoPrompts = prompts.map(p => `Scene ${p.scene_number} — ${p.duration}\n${p.video_prompt}`).join("\n\n");
+      const allNegativePrompts = prompts.map(p => `Scene ${p.scene_number} — ${p.duration}\n${p.negative_prompt}`).join("\n\n");
 
       document.getElementById("output").className = "";
-      document.getElementById("output").innerHTML = warnHtml + `
-        <!-- FULL WIDTH: Episode Overview -->
-        <section class="card full-width">
-          <h2>Episode Overview</h2>
-          <h3>${escapeHtml(episodeTitle)}</h3>
-          <p style="font-size:14px;color:var(--text-muted);margin:4px 0 12px;">${escapeHtml(pkg.animal || "")}</p>
+      document.getElementById("output").innerHTML = `
+        ${renderMissingFields(missing)}
+
+        <div class="toolbar">
+          <button class="copy-btn" data-copy-text="${escapeHtml(fullJsonText)}" onclick="copyText(this)">Copy Full JSON</button>
+          <button class="copy-btn" data-copy-text="${escapeHtml(fullScriptText)}" onclick="copyText(this)">Copy VO Script</button>
+          <button class="copy-btn" data-copy-text="${escapeHtml(storyboardCopyPrompt)}" onclick="copyText(this)">Copy Storyboard Prompt</button>
+          <button class="copy-btn" data-copy-text="${escapeHtml(allImagePrompts)}" onclick="copyText(this)">Copy All Image Prompts</button>
+          <button class="copy-btn" data-copy-text="${escapeHtml(allVideoPrompts)}" onclick="copyText(this)">Copy All Video Prompts</button>
+        </div>
+
+        <section class="card">
+          <div class="card-header">
+            <h2>Episode Overview</h2>
+            <button class="copy-btn" data-copy-text="${escapeHtml(fullJsonText)}" onclick="copyText(this)">Copy JSON</button>
+          </div>
+
+          <div class="overview-title">${escapeHtml(overview.episode_title || "Untitled Episode")}</div>
+          <p class="overview-logline">${escapeHtml(overview.logline || "")}</p>
+
           <div class="badge-row">
-            <span class="badge orange">${escapeHtml(pkg.runtime || "")}</span>
-            <span class="badge">${escapeHtml(meta.tone || "")}</span>
-            <span class="badge">${escapeHtml(meta.format || "")}</span>
-            <span class="badge">${escapeHtml(meta.style || "")}</span>
-            <span class="badge">${escapeHtml(meta.target_platform || "")}</span>
+            <span class="badge accent">${escapeHtml(overview.animal || "Animal")}</span>
+            <span class="badge">${escapeHtml(overview.episode_type || "Episode Type")}</span>
+            <span class="badge">${escapeHtml(overview.runtime || "Runtime")}</span>
+            <span class="badge">${escapeHtml(overview.format || "Format")}</span>
+            <span class="badge">${escapeHtml(overview.target_platform || "Platform")}</span>
           </div>
         </section>
 
         <div class="preview-grid">
-          <!-- LEFT COLUMN -->
-          <div class="preview-col">
-            <section class="card compact">
-              <h2>Hook</h2>
-              <p style="font-size:15px;line-height:1.6;color:var(--text);">${escapeHtml(pkg.hook || "")}</p>
+          <div class="preview-column">
+            <section class="card">
+              <div class="card-header">
+                <h2>Hook</h2>
+                <button class="copy-btn" data-copy-text="${escapeHtml(hook.hook_line || "")}" onclick="copyText(this)">Copy</button>
+              </div>
+              <h3>${escapeHtml(hook.hook_line || "")}</h3>
+              <p><strong>Curiosity Gap:</strong> ${escapeHtml(hook.curiosity_gap || "")}</p>
+              <p><strong>Payoff Setup:</strong> ${escapeHtml(hook.payoff_setup || "")}</p>
             </section>
 
-            <section class="card compact">
-              <h2>Summary</h2>
-              <p style="font-size:14px;line-height:1.7;color:var(--text-muted);">${escapeHtml(pkg.summary || "")}</p>
+            <section class="card">
+              <div class="card-header">
+                <h2>Summary</h2>
+                <button class="copy-btn" data-copy-text="${escapeHtml((summary.short_summary || "") + "\n\n" + (summary.full_summary || ""))}" onclick="copyText(this)">Copy</button>
+              </div>
+              <h3>${escapeHtml(summary.short_summary || "")}</h3>
+              <p>${escapeHtml(summary.full_summary || "")}</p>
             </section>
 
-            <section class="card compact">
-              <h2>QA Score</h2>
-              ${qa ? `
-                <div class="qa-metrics">
-                  ${Object.entries(qa).map(([k, v]) => `
-                    <div class="qa-metric">
-                      <div class="qa-value">${escapeHtml(String(v))}</div>
-                      <div class="qa-label">${escapeHtml(k)}</div>
-                    </div>
-                  `).join("")}
+            <section class="card">
+              <div class="card-header">
+                <h2>QA Score</h2>
+              </div>
+              <div class="qa-grid">
+                ${[
+                  ["Overall", qa.overall_score],
+                  ["Hook", qa.hook_score],
+                  ["Structure", qa.structure_score],
+                  ["Visual", qa.visual_score],
+                  ["Factuality", qa.factuality_score],
+                  ["Pacing", qa.pacing_score]
+                ].map(([label, value]) => `
+                  <div class="qa-tile">
+                    <div class="qa-value">${escapeHtml(value ?? "—")}</div>
+                    <div class="qa-label">${escapeHtml(label)}</div>
+                  </div>
+                `).join("")}
+              </div>
+              ${Array.isArray(qa.notes) && qa.notes.length ? `
+                <ul class="notes-list">
+                  ${qa.notes.map(note => `<li>${escapeHtml(note)}</li>`).join("")}
+                </ul>
+              ` : ""}
+            </section>
+
+            <section class="card">
+              <div class="card-header">
+                <h2>VO Script</h2>
+                <button class="copy-btn" data-copy-text="${escapeHtml(fullScriptText)}" onclick="copyText(this)">Copy</button>
+              </div>
+
+              ${(vo.lines || []).map(line => `
+                <div class="script-line">
+                  <div class="script-meta">Scene ${escapeHtml(line.scene_number)} · ${escapeHtml(line.timestamp || "")} · ${escapeHtml(line.duration || "")}</div>
+                  <div class="script-text">${escapeHtml(line.voiceover || "")}</div>
                 </div>
-              ` : `
-                <p class="qa-placeholder">QA score not included in this package yet.</p>
-              `}
-            </section>
-
-            <section class="card compact">
-              <h2>VO Script <button class="btn btn-sm btn-secondary" style="float:right" data-copy-label="VO Script" onclick="copyText(this)">Copy VO Script</button></h2>
-              <pre style="background:none;padding:0;border:none;font-size:13px;line-height:1.6;white-space:pre-wrap;max-height:400px;overflow-y:auto;font-family:var(--font);margin:0;">${escapeHtml(voScriptText)}</pre>
+              `).join("")}
             </section>
           </div>
 
-          <!-- RIGHT COLUMN -->
-          <div class="preview-col">
-            <section class="card compact">
-              <h2>Storyboard <button class="btn btn-sm btn-secondary" style="float:right" data-copy-label="Storyboard Prompt" onclick="copyText(this)">Copy Storyboard Prompt</button></h2>
-              ${scenes.map((s, i) => `
-                <div class="storyboard-scene">
-                  <div class="sb-header">Panel ${i + 1} &mdash; ${escapeHtml(s.duration || "?")} | ${escapeHtml(s.camera_style || "cinematic")}</div>
-                  <div class="sb-detail">
-                    <span>Sound:</span> ${escapeHtml(s.sound_design || "\u2014")}<br>
-                    <span>Visual:</span> ${escapeHtml((s.image_prompt || "").substring(0, 120))}${(s.image_prompt || "").length > 120 ? "..." : ""}
+          <div class="preview-column">
+            <section class="card">
+              <div class="card-header">
+                <h2>Storyboard</h2>
+                <button class="copy-btn" data-copy-text="${escapeHtml(storyboardCopyPrompt)}" onclick="copyText(this)">Copy Prompt</button>
+              </div>
+
+              <div class="storyboard-grid">
+                ${panels.map(panel => `
+                  <div class="storyboard-card">
+                    <div class="storyboard-card-title">Panel ${escapeHtml(panel.panel_number)} · ${escapeHtml(panel.duration || "")}</div>
+                    <p><strong>Visual:</strong> ${escapeHtml(panel.visual_beat || "")}</p>
+                    <p><strong>Action:</strong> ${escapeHtml(panel.subject_action || "")}</p>
+                    <p><strong>Camera:</strong> ${escapeHtml(panel.camera_style || "")}</p>
+                    <p><strong>Composition:</strong> ${escapeHtml(panel.composition || "")}</p>
+                  </div>
+                `).join("")}
+              </div>
+
+              <div class="negative-block">
+                <div class="prompt-label">Storyboard Copy Prompt</div>
+                <button class="copy-btn copy-absolute" data-copy-text="${escapeHtml(storyboardCopyPrompt)}" onclick="copyText(this)">Copy</button>
+                <pre>${escapeHtml(storyboardCopyPrompt)}</pre>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-header">
+                <h2>Thumbnail Prompt</h2>
+                <button class="copy-btn" data-copy-text="${escapeHtml(thumbnail.prompt || "")}" onclick="copyText(this)">Copy</button>
+              </div>
+
+              <div class="prompt-block">
+                <div class="prompt-label">Prompt</div>
+                <pre>${escapeHtml(thumbnail.prompt || "")}</pre>
+              </div>
+
+              <div class="negative-block">
+                <div class="prompt-label">Negative Prompt</div>
+                <pre>${escapeHtml(thumbnail.negative_prompt || "")}</pre>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-header">
+                <h2>Social Export</h2>
+                <button class="copy-btn" data-copy-text="${escapeHtml(socialExportText)}" onclick="copyText(this)">Copy All</button>
+              </div>
+
+              <p>${escapeHtml(social.caption || "")}</p>
+
+              <div class="pill-list">
+                ${(social.hashtags || []).map(tag => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}
+              </div>
+
+              ${(social.title_options || []).length ? `
+                <ul class="title-options">
+                  ${(social.title_options || []).map(title => `<li>${escapeHtml(title)}</li>`).join("")}
+                </ul>
+              ` : ""}
+
+              <div class="social-actions">
+                <button class="copy-btn" data-copy-text="${escapeHtml(social.caption || "")}" onclick="copyText(this)">Copy Caption</button>
+                <button class="copy-btn" data-copy-text="${escapeHtml((social.hashtags || []).join(" "))}" onclick="copyText(this)">Copy Hashtags</button>
+                <button class="copy-btn" data-copy-text="${escapeHtml(social.description || "")}" onclick="copyText(this)">Copy Description</button>
+              </div>
+            </section>
+          </div>
+
+          <section class="card full-width">
+            <div class="card-header">
+              <h2>Image & Video Prompts</h2>
+              <div class="social-actions" style="margin-top:0;">
+                <button class="copy-btn" data-copy-text="${escapeHtml(allImagePrompts)}" onclick="copyText(this)">Copy Images</button>
+                <button class="copy-btn" data-copy-text="${escapeHtml(allVideoPrompts)}" onclick="copyText(this)">Copy Videos</button>
+                <button class="copy-btn" data-copy-text="${escapeHtml(allNegativePrompts)}" onclick="copyText(this)">Copy Negatives</button>
+              </div>
+            </div>
+
+            <div class="prompt-list">
+              ${prompts.map(prompt => `
+                <div class="prompt-scene">
+                  <div class="prompt-scene-header">
+                    <span>Scene ${escapeHtml(prompt.scene_number)} · ${escapeHtml(prompt.duration || "")}</span>
+                  </div>
+
+                  <div class="prompt-row">
+                    <div class="prompt-block">
+                      <div class="prompt-label">Image Prompt</div>
+                      <button class="copy-btn copy-absolute" data-copy-text="${escapeHtml(prompt.image_prompt || "")}" onclick="copyText(this)">Copy</button>
+                      <pre>${escapeHtml(prompt.image_prompt || "")}</pre>
+                    </div>
+
+                    <div class="prompt-block">
+                      <div class="prompt-label">Video Prompt</div>
+                      <button class="copy-btn copy-absolute" data-copy-text="${escapeHtml(prompt.video_prompt || "")}" onclick="copyText(this)">Copy</button>
+                      <pre>${escapeHtml(prompt.video_prompt || "")}</pre>
+                    </div>
+                  </div>
+
+                  <div class="negative-block">
+                    <div class="prompt-label">Negative Prompt</div>
+                    <button class="copy-btn copy-absolute" data-copy-text="${escapeHtml(prompt.negative_prompt || "")}" onclick="copyText(this)">Copy</button>
+                    <pre>${escapeHtml(prompt.negative_prompt || "")}</pre>
                   </div>
                 </div>
               `).join("")}
-              <details style="margin-top:12px;">
-                <summary style="font-size:12px;color:var(--text-muted);cursor:pointer;">Storyboard Prompt (click to expand)</summary>
-                <pre style="margin-top:8px;font-size:12px;line-height:1.5;max-height:200px;overflow-y:auto;">${escapeHtml(storyboardPrompt)}</pre>
-              </details>
-            </section>
-
-            <section class="card compact">
-              <h2>Thumbnail Prompt <button class="btn btn-sm btn-secondary" style="float:right" data-copy-label="Thumbnail Prompt" onclick="copyText(this)">Copy</button></h2>
-              <div class="prompt-block" style="margin-top:12px;">
-                <pre>${escapeHtml(pkg.thumbnail_prompt || "")}</pre>
-              </div>
-            </section>
-
-            <section class="card compact">
-              <h2>Social Export</h2>
-              <p style="font-size:14px;line-height:1.6;color:var(--text);margin-bottom:10px;">${escapeHtml(pkg.caption || "")}</p>
-              <div class="hashtags">
-                ${hashtags.map(h => '<span class="hashtag">' + escapeHtml(h) + '</span>').join("")}
-              </div>
-              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="btn btn-sm btn-secondary" data-copy-label="Caption" onclick="copyText(this)">Copy Caption</button>
-                <button class="btn btn-sm btn-secondary" data-copy-label="Hashtags" data-copy-text="${escapeHtml(hashtagsText)}" onclick="copyText(this)">Copy Hashtags</button>
-                <button class="btn btn-sm btn-secondary" data-copy-label="Social Export" data-copy-text="${escapeHtml(socialExportText)}" onclick="copyText(this)">Copy Social Export</button>
-              </div>
-            </section>
-          </div>
+            </div>
+          </section>
         </div>
-
-        <!-- FULL WIDTH: Image & Video Prompts -->
-        <section class="card full-width">
-          <h2>Image & Video Prompts</h2>
-          <div class="prompt-grid">
-            ${scenes.map(s => `
-              <div class="prompt-block">
-                <div class="prompt-label">Scene ${escapeHtml(s.scene_number)} &mdash; ${escapeHtml(s.duration)} | Image Prompt <button class="copy-btn" data-copy-label="Image Prompt" onclick="copyText(this)">Copy</button></div>
-                <pre>${escapeHtml(s.image_prompt || "")}</pre>
-              </div>
-              <div class="prompt-block">
-                <div class="prompt-label">Scene ${escapeHtml(s.scene_number)} &mdash; ${escapeHtml(s.duration)} | Video Prompt <button class="copy-btn" data-copy-label="Video Prompt" onclick="copyText(this)">Copy</button></div>
-                <pre>${escapeHtml(s.video_prompt || "")}</pre>
-              </div>
-            `).join("")}
-          </div>
-        </section>
       `;
 
-      setStatus(missing.length ? "active" : "loaded",
-        missing.length ? "JSON Loaded (" + missing.length + " warnings)" : "JSON Loaded");
+      setStatus(missing.length ? "active" : "loaded", missing.length ? `Loaded with ${missing.length} warnings` : "Package Loaded");
     }
 
     function createGptPrompt() {
@@ -799,60 +1216,123 @@
 
       if (!animal) {
         showError("<strong>Animal / Topic is required.</strong>");
-        setStatus("error", "Missing animal/topic");
         return;
       }
 
+      const shape = {
+        schema_version: "2.0",
+        episode_overview: {
+          episode_title: "",
+          animal: "",
+          episode_type: "",
+          runtime: "",
+          tone: "",
+          format: "",
+          visual_style: "",
+          target_platform: "",
+          logline: ""
+        },
+        hook: {
+          hook_line: "",
+          curiosity_gap: "",
+          payoff_setup: ""
+        },
+        summary: {
+          short_summary: "",
+          full_summary: ""
+        },
+        qa_score: {
+          overall_score: 0,
+          hook_score: 0,
+          structure_score: 0,
+          visual_score: 0,
+          factuality_score: 0,
+          pacing_score: 0,
+          notes: []
+        },
+        vo_script: {
+          full_script: "",
+          lines: [
+            {
+              scene_number: 1,
+              timestamp: "",
+              duration: "",
+              voiceover: ""
+            }
+          ]
+        },
+        storyboard: {
+          storyboard_copy_prompt: "",
+          panels: [
+            {
+              panel_number: 1,
+              duration: "",
+              visual_beat: "",
+              subject_action: "",
+              environment: "",
+              camera_style: "",
+              lighting: "",
+              composition: "",
+              consistency_notes: ""
+            }
+          ]
+        },
+        image_video_prompts: [
+          {
+            scene_number: 1,
+            duration: "",
+            image_prompt: "",
+            video_prompt: "",
+            negative_prompt: ""
+          }
+        ],
+        thumbnail_prompt: {
+          prompt: "",
+          negative_prompt: ""
+        },
+        social_export: {
+          caption: "",
+          hashtags: [],
+          title_options: [],
+          description: "",
+          keywords: []
+        }
+      };
+
       const prompt = [
-        "Generate a full Wildlife Documentary Engine package as STRICT valid JSON only.",
+        "Generate a full Wildlife Documentary Engine package as strict valid JSON only.",
         "",
-        "RULES:",
-        "- Do NOT use markdown.",
-        "- Do NOT wrap the JSON in code fences.",
-        "- Do NOT include commentary before or after the JSON.",
-        "- Return ONLY the JSON object — nothing else.",
+        "Rules:",
+        "- Return only JSON.",
+        "- Do not use markdown.",
+        "- Do not wrap the JSON in code fences.",
+        "- Do not include commentary before or after the JSON.",
+        "- Use schema_version \"2.0\".",
+        "- Do not add extra fields.",
+        "- Make every prompt generation-ready.",
+        "- Make it cinematic, factual, student-safe, and suitable for short-form vertical video.",
         "",
-        "INPUTS:",
+        "Inputs:",
         "Animal / Topic: " + animal,
         "Episode Type: " + episodeType,
         "Length: " + length,
         "Visual Style: " + visualStyle,
         extraRequirements ? "Extra Requirements: " + extraRequirements : "",
         "",
-        "REQUIRED JSON SHAPE (every field mandatory):",
-        JSON.stringify({
-          episode_title: "",
-          animal: "",
-          hook: "",
-          summary: "",
-          runtime: "",
-          scenes: [{
-            scene_number: 1,
-            duration: "",
-            narration: "",
-            on_screen_text: "",
-            image_prompt: "",
-            video_prompt: "",
-            camera_style: "",
-            sound_design: ""
-          }],
-          thumbnail_prompt: "",
-          caption: "",
-          hashtags: [],
-          metadata: {
-            tone: "",
-            format: "",
-            style: "",
-            target_platform: ""
-          }
-        }, null, 2)
+        "Required JSON shape:",
+        JSON.stringify(shape, null, 2)
       ].filter(Boolean).join("\n");
 
       document.getElementById("output").className = "";
       document.getElementById("output").innerHTML = `
         <section class="card">
-          <h2>GPT Prompt <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this)">Copy GPT Prompt</button></h2>
-          <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Copy this into your Wildlife Documentary Engine Custom GPT, then paste the returned JSON back here.</p>
+          <div class="card-header">
+            <h2>GPT Prompt</h2>
+            <button class="copy-btn" data-copy-text="${escapeHtml(prompt)}" onclick="copyText(this)">Copy Prompt</button>
+          </div>
+
+          <p style="margin-bottom:14px;">Copy this into your Wildlife Documentary Engine Custom GPT.</p>
+
           <div class="prompt-block">
             <pre>${escapeHtml(prompt)}</pre>
           </div>
@@ -864,163 +1344,186 @@
 
     function previewJson() {
       const raw = document.getElementById("jsonInput").value.trim();
+
       if (!raw) {
-        showError("<strong>No JSON found.</strong> Paste JSON from your Custom GPT first.");
-        setStatus("error", "No JSON input");
+        showError("<strong>No JSON found.</strong><br>Paste JSON from your Custom GPT first.");
         return;
       }
+
       try {
         const pkg = JSON.parse(raw);
         renderPackage(pkg);
-      } catch (e) {
-        showError("<strong>Invalid JSON.</strong><br>Check for markdown fences, trailing commas, or extra text.<br><br><em>" + escapeHtml(e.message) + "</em>");
-        setStatus("error", "Invalid JSON");
+      } catch (error) {
+        showError("<strong>Invalid JSON.</strong><br>Check for code fences, trailing commas, or extra text.<br><br><em>" + escapeHtml(error.message) + "</em>");
       }
     }
 
     function clearJson() {
       document.getElementById("jsonInput").value = "";
+      document.getElementById("animalInput").value = "";
+      currentPackageId = null;
+      lastRenderedPackage = null;
+
       document.getElementById("output").className = "empty-state";
       document.getElementById("output").innerHTML = `
-        <div class="icon">🎬</div>
-        <p>Create a GPT prompt or load a Wildlife Documentary JSON package to preview it here.</p>
-        <p class="hint">Step 1: Configure &rarr; Step 2: Copy prompt to Custom GPT &rarr; Step 3: Paste JSON &rarr; Step 4: Preview</p>
+        <div class="empty-state-content">
+          <h2>No package loaded</h2>
+          <p>Create a GPT prompt, paste a JSON package, or start Auto Preview to load the latest saved package.</p>
+        </div>
       `;
-      document.getElementById("animalInput").value = "";
+
       setStatus("ready", "Ready");
     }
 
     async function loadSampleJson() {
       try {
-        const res = await fetch("./examples/sample-output.json");
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const pkg = await res.json();
+        const response = await fetch("./examples/sample-output.json");
+        if (!response.ok) throw new Error("HTTP " + response.status);
+
+        const pkg = await response.json();
         document.getElementById("jsonInput").value = JSON.stringify(pkg, null, 2);
         renderPackage(pkg);
-      } catch (e) {
-        if (e.message.startsWith("HTTP")) {
-          showError("<strong>Cannot load sample.</strong><br>" + escapeHtml(e.message));
-        } else {
-          showError("<strong>Sample loading requires running the project through a local server, not opening the HTML file directly.</strong><br><br><em>Try: <code>npx serve .</code> or <code>python -m http.server 8000</code></em>");
-        }
-        setStatus("error", "Sample load failed");
+      } catch (error) {
+        showError("<strong>Cannot load sample.</strong><br>" + escapeHtml(error.message));
       }
     }
 
-    // ---- Auto Preview ----
-    let autoPreviewTimer = null;
-    let currentPackageId = null;
+    function toggleAutoPreview() {
+      if (autoPreviewTimer) {
+        stopAutoPreview();
+      } else {
+        startAutoPreview();
+      }
+    }
 
     function startAutoPreview() {
-      if (autoPreviewTimer) return stopAutoPreview();
       autoPreviewTimer = setInterval(pollLatestPackage, 3000);
-      document.getElementById("autoPreviewStatus").style.display = "block";
-      document.getElementById("autoPreviewMsg").textContent = "Waiting for Custom GPT output...";
-      document.getElementById("autoPreviewBtn").textContent = "Stop Auto Preview";
-      document.getElementById("autoPreviewBtn").style.background = "var(--green)";
-      document.getElementById("autoPreviewBtn").style.color = "#0a0e17";
+
+      const status = document.getElementById("autoPreviewStatus");
+      const button = document.getElementById("autoPreviewBtn");
+      const msg = document.getElementById("autoPreviewMsg");
+
+      status.style.display = "block";
+      msg.textContent = "Waiting for Custom GPT output...";
+      msg.style.color = "var(--muted)";
+      button.textContent = "Stop Auto Preview";
+
       setStatus("active", "Auto Preview On");
-      // Do an immediate poll
       pollLatestPackage();
     }
 
     function stopAutoPreview() {
-      if (autoPreviewTimer) { clearInterval(autoPreviewTimer); autoPreviewTimer = null; }
+      clearInterval(autoPreviewTimer);
+      autoPreviewTimer = null;
+
       document.getElementById("autoPreviewStatus").style.display = "none";
       document.getElementById("autoPreviewBtn").textContent = "Start Auto Preview";
-      document.getElementById("autoPreviewBtn").style.background = "";
-      document.getElementById("autoPreviewBtn").style.color = "";
-      setStatus("ready", "Auto Preview OFF");
+
+      setStatus("ready", "Auto Preview Off");
     }
 
     async function pollLatestPackage() {
-      const msgEl = document.getElementById("autoPreviewMsg");
+      const msg = document.getElementById("autoPreviewMsg");
+
       try {
-        const res = await fetch("/api/packages/latest");
-        if (!res.ok) {
-          if (res.status === 404) {
-            msgEl.textContent = "Waiting for Custom GPT output...";
-            msgEl.style.color = "var(--text-muted)";
+        const response = await fetch("/api/packages/latest");
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            msg.textContent = "Waiting for Custom GPT output...";
+            msg.style.color = "var(--muted)";
             return;
           }
-          throw new Error("HTTP " + res.status);
+
+          throw new Error("HTTP " + response.status);
         }
-        const data = await res.json();
+
+        const data = await response.json();
+
         if (data.ok && data.id !== currentPackageId) {
           currentPackageId = data.id;
           document.getElementById("jsonInput").value = JSON.stringify(data.package, null, 2);
           renderPackage(data.package);
-          msgEl.textContent = "New package loaded automatically! (" + data.id + ")";
-          msgEl.style.color = "var(--green)";
-          setStatus("loaded", "New package received");
+          msg.textContent = "New package loaded automatically.";
+          msg.style.color = "var(--success)";
+          setStatus("loaded", "New Package Received");
         }
-      } catch (e) {
-        msgEl.textContent = "Backend unavailable.";
-        msgEl.style.color = "var(--red)";
+      } catch (error) {
+        msg.textContent = "Backend unavailable.";
+        msg.style.color = "var(--danger)";
+        setStatus("error", "Backend Unavailable");
       }
     }
 
     async function loadLatestPackage() {
       try {
-        const res = await fetch("/api/packages/latest");
-        if (!res.ok) {
-          if (res.status === 404) {
-            showError("<strong>No saved packages yet.</strong><br>Generate one via the Custom GPT or save a pasted JSON first.");
-            setStatus("error", "No packages");
+        const response = await fetch("/api/packages/latest");
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            showError("<strong>No saved packages yet.</strong><br>Generate one using your Custom GPT Action first.");
             return;
           }
-          throw new Error("HTTP " + res.status);
+
+          throw new Error("HTTP " + response.status);
         }
-        const data = await res.json();
+
+        const data = await response.json();
+
         if (data.ok) {
           currentPackageId = data.id;
           document.getElementById("jsonInput").value = JSON.stringify(data.package, null, 2);
           renderPackage(data.package);
-          setStatus("loaded", "Package loaded: " + data.id);
+          setStatus("loaded", "Latest Package Loaded");
         }
-      } catch (e) {
-        showError("<strong>Backend unavailable.</strong><br>" + escapeHtml(e.message));
-        setStatus("error", "Backend unavailable");
+      } catch (error) {
+        showError("<strong>Backend unavailable.</strong><br>" + escapeHtml(error.message));
       }
     }
 
     async function savePastedJson() {
       const raw = document.getElementById("jsonInput").value.trim();
+
       if (!raw) {
         showError("<strong>No JSON to save.</strong><br>Paste a JSON package first.");
-        setStatus("error", "Nothing to save");
         return;
       }
+
       let pkg;
-      try { pkg = JSON.parse(raw); } catch (e) {
-        showError("<strong>Invalid JSON.</strong><br>" + escapeHtml(e.message));
-        setStatus("error", "Invalid JSON");
+
+      try {
+        pkg = JSON.parse(raw);
+      } catch (error) {
+        showError("<strong>Invalid JSON.</strong><br>" + escapeHtml(error.message));
         return;
       }
+
       try {
-        const res = await fetch("/api/packages", {
+        const response = await fetch("/api/packages", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify(pkg)
         });
-        const data = await res.json();
-        if (!res.ok) {
-          const errList = (data.errors || []).map(e => e.path + ": " + e.message).join("<br>");
-          showError("<strong>Validation failed.</strong><br>" + escapeHtml(data.message) + (errList ? "<br><br>" + errList : ""));
-          setStatus("error", "Validation failed");
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          showError("<strong>Save failed.</strong><br>" + escapeHtml(data.error || data.message || "The backend rejected this package."));
           return;
         }
+
         currentPackageId = data.id;
+        document.getElementById("jsonInput").value = JSON.stringify(data.package, null, 2);
         renderPackage(data.package);
-        setStatus("loaded", "Package saved: " + data.id);
-      } catch (e) {
-        showError("<strong>Backend unavailable.</strong><br>" + escapeHtml(e.message));
-        setStatus("error", "Backend unavailable");
+        setStatus("loaded", "Package Saved");
+      } catch (error) {
+        showError("<strong>Backend unavailable.</strong><br>" + escapeHtml(error.message));
       }
     }
 
-    // Auto-load sample on page load
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", () => {
       loadSampleJson();
     });
   </script>

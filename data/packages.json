@@ -91,5 +91,96 @@
         }
       ]
     }
+  },
+  {
+    "id": "pkg_1783278170326__KmCkqH7",
+    "createdAt": "2026-07-05T19:02:50.327Z",
+    "package": {
+      "schema_version": "2.0",
+      "episode_overview": {
+        "episode_title": "Test",
+        "animal": "Bear",
+        "episode_type": "Feature",
+        "runtime": "60s",
+        "tone": "Cinematic",
+        "format": "9:16",
+        "visual_style": "BBC",
+        "target_platform": "TikTok",
+        "logline": "A test."
+      },
+      "hook": {
+        "hook_line": "Wow",
+        "curiosity_gap": "How?",
+        "payoff_setup": "Wait for it"
+      },
+      "summary": {
+        "short_summary": "Short",
+        "full_summary": "Full"
+      },
+      "qa_score": {
+        "overall_score": 80,
+        "hook_score": 80,
+        "structure_score": 80,
+        "visual_score": 80,
+        "factuality_score": 80,
+        "pacing_score": 80,
+        "notes": [
+          "Good"
+        ]
+      },
+      "vo_script": {
+        "full_script": "Narration",
+        "lines": [
+          {
+            "scene_number": 1,
+            "timestamp": "0:00",
+            "duration": "5s",
+            "voiceover": "Hello"
+          }
+        ]
+      },
+      "storyboard": {
+        "storyboard_copy_prompt": "Draw it",
+        "panels": [
+          {
+            "panel_number": 1,
+            "duration": "5s",
+            "visual_beat": "Beat",
+            "subject_action": "Action",
+            "environment": "Cave",
+            "camera_style": "Macro",
+            "lighting": "Dark",
+            "composition": "Close",
+            "consistency_notes": "Keep"
+          }
+        ]
+      },
+      "image_video_prompts": [
+        {
+          "scene_number": 1,
+          "duration": "5s",
+          "image_prompt": "Image",
+          "video_prompt": "Video",
+          "negative_prompt": "None"
+        }
+      ],
+      "thumbnail_prompt": {
+        "prompt": "Thumb",
+        "negative_prompt": "None"
+      },
+      "social_export": {
+        "caption": "Cap",
+        "hashtags": [
+          "#tag"
+        ],
+        "title_options": [
+          "Title"
+        ],
+        "description": "Desc",
+        "keywords": [
+          "wildlife"
+        ]
+      }
+    }
   }
 ]

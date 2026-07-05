@@ -1,44 +1,123 @@
 {
-  "episode_title": "The Mole With a Living Radar",
-  "animal": "Star-nosed mole",
-  "hook": "This tiny mammal hunts faster than the human eye can follow.",
-  "summary": "A short cinematic wildlife documentary episode about how the star-nosed mole uses its strange nose as a biological radar system to hunt in complete darkness.",
-  "runtime": "60 seconds",
-  "scenes": [
+  "schema_version": "2.0",
+  "episode_overview": {
+    "episode_title": "The Mole With a Living Radar",
+    "animal": "Star-nosed mole",
+    "episode_type": "Creature Feature",
+    "runtime": "60 seconds",
+    "tone": "Cinematic wildlife documentary",
+    "format": "9:16 vertical short-form video",
+    "visual_style": "BBC Earth inspired macro realism",
+    "target_platform": "TikTok, Reels, YouTube Shorts",
+    "logline": "A star-nosed mole uses its biological radar to hunt in complete darkness, revealing one of nature's fastest sensory systems."
+  },
+  "hook": {
+    "hook_line": "This tiny mammal hunts faster than the human eye can follow.",
+    "curiosity_gap": "How does an almost-blind creature catch prey in total darkness?",
+    "payoff_setup": "The answer lies in the strangest nose on Earth — a living biological radar."
+  },
+  "summary": {
+    "short_summary": "The star-nosed mole uses its bizarre tentacled nose as a high-speed touch organ to hunt in complete darkness.",
+    "full_summary": "A short cinematic wildlife documentary episode about how the star-nosed mole uses its strange nose as a biological radar system to hunt in complete darkness. Featuring macro cinematography, underground tunnel sequences, and extreme close-ups of the mole's unique sensory tentacles."
+  },
+  "qa_score": {
+    "overall_score": 85,
+    "hook_score": 90,
+    "structure_score": 82,
+    "visual_score": 88,
+    "factuality_score": 95,
+    "pacing_score": 80,
+    "notes": [
+      "Strong hook with immediate curiosity gap",
+      "Visual descriptions are vivid and production-ready",
+      "Consider adding more tension in mid-section pacing"
+    ]
+  },
+  "vo_script": {
+    "full_script": "Scene 1 — 5s\nBeneath the wet soil of North America, a creature searches in total darkness.\n\nScene 2 — 6s\nIts nose is not just strange. It is one of the fastest touch organs in the animal kingdom.",
+    "lines": [
+      {
+        "scene_number": 1,
+        "timestamp": "0:00",
+        "duration": "5s",
+        "voiceover": "Beneath the wet soil of North America, a creature searches in total darkness."
+      },
+      {
+        "scene_number": 2,
+        "timestamp": "0:05",
+        "duration": "6s",
+        "voiceover": "Its nose is not just strange. It is one of the fastest touch organs in the animal kingdom."
+      }
+    ]
+  },
+  "storyboard": {
+    "storyboard_copy_prompt": "Create a clean cinematic storyboard sheet for The Mole With a Living Radar, vertical wildlife documentary style, consistent subject, consistent visual style.\n\nPanel 1:\nBBC Earth style macro wildlife documentary shot, wet underground tunnel, star-nosed mole moving through dark soil, natural textures, cinematic lighting, no humans\nCamera: Macro close-up, shallow depth of field, slow push-in feeling\n\nPanel 2:\nExtreme macro shot of star-nosed mole nose tentacles, wet pink sensory rays, dark natural background, high-detail wildlife documentary style\nCamera: Extreme macro detail shot, locked camera, intense focus on the nose\n\nDesign rules:\n- consistent animal appearance\n- consistent habitat\n- no humans\n- no text overlays unless required\n- clean panel borders\n- professional documentary storyboard layout",
+    "panels": [
+      {
+        "panel_number": 1,
+        "duration": "5s",
+        "visual_beat": "Mysterious underground world revealed",
+        "subject_action": "Star-nosed mole moving through dark soil tunnel",
+        "environment": "Wet underground tunnel, dark earth textures, roots visible",
+        "camera_style": "Macro close-up, shallow depth of field, slow push-in feeling",
+        "lighting": "Cinematic natural lighting, soft rim light from tunnel opening",
+        "composition": "Low angle tracking shot following the mole from behind",
+        "consistency_notes": "Maintain wet soil color palette, mole fur texture consistent"
+      },
+      {
+        "panel_number": 2,
+        "duration": "6s",
+        "visual_beat": "Reveal of the star-nosed mole's unique sensory organ",
+        "subject_action": "Nose tentacles twitching rapidly, scanning tunnel floor",
+        "environment": "Dark underground tunnel, close dirt walls, moisture visible",
+        "camera_style": "Extreme macro detail shot, locked camera, intense focus on the nose",
+        "lighting": "Dramatic documentary lighting highlighting tentacle texture",
+        "composition": "Extreme close-up centered on nose, shallow depth blurs background",
+        "consistency_notes": "Same mole as panel 1, same tunnel environment, continuous sequence"
+      }
+    ]
+  },
+  "image_video_prompts": [
     {
       "scene_number": 1,
       "duration": "5s",
-      "narration": "Beneath the wet soil of North America, a creature searches in total darkness.",
-      "on_screen_text": "A hunter below ground",
       "image_prompt": "BBC Earth style macro wildlife documentary shot, wet underground tunnel, star-nosed mole moving through dark soil, natural textures, cinematic lighting, no humans",
       "video_prompt": "5-second macro wildlife documentary shot, star-nosed mole moving through a damp underground tunnel, subtle handheld camera feel, shallow depth of field, no humans",
-      "camera_style": "Macro close-up, shallow depth of field, slow push-in feeling",
-      "sound_design": "Low soil movement, soft rumble, quiet underground ambience"
+      "negative_prompt": "Daylight, surface, humans, cartoon style, text overlay, artificial lighting"
     },
     {
       "scene_number": 2,
       "duration": "6s",
-      "narration": "Its nose is not just strange. It is one of the fastest touch organs in the animal kingdom.",
-      "on_screen_text": "A living radar",
       "image_prompt": "Extreme macro shot of star-nosed mole nose tentacles, wet pink sensory rays, dark natural background, high-detail wildlife documentary style",
       "video_prompt": "6-second extreme macro wildlife shot, sensory rays twitching rapidly as the mole scans the tunnel floor, cinematic natural lighting, no humans",
-      "camera_style": "Extreme macro detail shot, locked camera, intense focus on the nose",
-      "sound_design": "Tiny clicks, soft organic movement, subtle tension pulse"
+      "negative_prompt": "Daylight, surface, humans, cartoon style, text overlay, artificial lighting"
     }
   ],
-  "thumbnail_prompt": "Cinematic macro thumbnail of a star-nosed mole emerging from dark wet soil, strange nose clearly visible, dramatic documentary lighting, high detail, no text",
-  "caption": "This mole hunts with a living radar hidden beneath the soil.",
-  "hashtags": [
-    "#Wildlife",
-    "#NatureDocumentary",
-    "#AnimalFacts",
-    "#StarNosedMole",
-    "#Science"
-  ],
-  "metadata": {
-    "tone": "Cinematic wildlife documentary",
-    "format": "9:16 vertical short-form video",
-    "style": "BBC Earth inspired macro realism",
-    "target_platform": "TikTok, Reels, YouTube Shorts"
+  "thumbnail_prompt": {
+    "prompt": "Cinematic macro thumbnail of a star-nosed mole emerging from dark wet soil, strange nose clearly visible, dramatic documentary lighting, high detail, no text",
+    "negative_prompt": "Text overlay, cartoon style, human, daylight, low resolution, blurry"
+  },
+  "social_export": {
+    "caption": "This mole hunts with a living radar hidden beneath the soil.",
+    "hashtags": [
+      "#Wildlife",
+      "#NatureDocumentary",
+      "#AnimalFacts",
+      "#StarNosedMole",
+      "#Science"
+    ],
+    "title_options": [
+      "The Mole With a Living Radar",
+      "Nature's Fastest Hunter Underground",
+      "The Blind Mole That Sees Everything"
+    ],
+    "description": "Discover how the star-nosed mole uses its bizarre tentacled nose as a biological radar to hunt faster than any other mammal. BBC Earth-style macro wildlife cinematography.",
+    "keywords": [
+      "wildlife documentary",
+      "star-nosed mole",
+      "animal senses",
+      "macro cinematography",
+      "underground wildlife"
+    ]
   }
 }
