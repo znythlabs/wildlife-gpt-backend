@@ -6,39 +6,73 @@ import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { nanoid } from "nanoid";
 import Ajv from "ajv";
+import { kv } from "@vercel/kv";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const isVercel = !!process.env.VERCEL;
+const useKV = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 const PORT = process.env.PORT || 3000;
 const ACTION_API_KEY = process.env.ACTION_API_KEY || "change_this_to_a_secret_key";
-const DATA_DIR = isVercel ? "/tmp" : resolve(__dirname, "data");
-const PACKAGES_FILE = resolve(DATA_DIR, "packages.json");
 const SCHEMA_FILE = resolve(__dirname, "schemas", "wildlife-package.schema.json");
 
-// Ensure data directory exists
-if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-if (!existsSync(PACKAGES_FILE)) writeFileSync(PACKAGES_FILE, "[]", "utf8");
+// KV key namespace
+const KV_LATEST = "wildlife:packages:latest";
+const KV_INDEX = "wildlife:packages:index";
+const kvKey = (id) => `wildlife:packages:${id}`;
 
-// Load schema & init AJV (strip $schema — AJV doesn't need draft-2020-12 meta)
+// ---- Local filesystem fallback (dev only) ----
+const DATA_DIR = resolve(__dirname, "data");
+const PACKAGES_FILE = resolve(DATA_DIR, "packages.json");
+
+if (!useKV) {
+  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
+  if (!existsSync(PACKAGES_FILE)) writeFileSync(PACKAGES_FILE, "[]", "utf8");
+}
+
+function loadPackagesFs() {
+  return JSON.parse(readFileSync(PACKAGES_FILE, "utf8"));
+}
+
+function savePackagesFs(packages) {
+  writeFileSync(PACKAGES_FILE, JSON.stringify(packages, null, 2), "utf8");
+}
+
+// ---- KV helpers ----
+async function savePackageKv(record) {
+  await kv.set(kvKey(record.id), JSON.stringify(record));
+  await kv.set(KV_LATEST, record.id);
+  await kv.lpush(KV_INDEX, record.id);
+}
+
+async function getLatestPackageKv() {
+  const id = await kv.get(KV_LATEST);
+  if (!id) return null;
+  const raw = await kv.get(kvKey(id));
+  return raw ? JSON.parse(raw) : null;
+}
+
+async function getAllPackagesKv() {
+  const ids = await kv.lrange(KV_INDEX, 0, -1);
+  const items = [];
+  for (const id of ids) {
+    const raw = await kv.get(kvKey(id));
+    if (raw) items.push(JSON.parse(raw));
+  }
+  return items;
+}
+
+// ---- Load schema & init AJV ----
 const schemaRaw = JSON.parse(readFileSync(SCHEMA_FILE, "utf8"));
 delete schemaRaw.$schema;
 const ajv = new Ajv({ allErrors: true });
 const validate = ajv.compile(schemaRaw);
 
-function loadPackages() {
-  const raw = readFileSync(PACKAGES_FILE, "utf8");
-  return JSON.parse(raw);
-}
-
-function savePackages(packages) {
-  writeFileSync(PACKAGES_FILE, JSON.stringify(packages, null, 2), "utf8");
-}
-
+// ---- Express app ----
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
-// Serve frontend: read index.html at startup (Vercel-safe, no __dirname reliance)
+// Static frontend
 const INDEX_HTML = readFileSync(resolve(__dirname, "index.html"), "utf8");
 const SAMPLE_JSON = readFileSync(resolve(__dirname, "examples", "sample-output.json"), "utf8");
 
@@ -51,7 +85,8 @@ app.get("/api/health", (_req, res) => {
     ok: true,
     service: "wildlife-documentary-engine",
     mode: "custom-gpt-action-storage",
-    status: "ready"
+    status: "ready",
+    storage: useKV ? "vercel-kv" : "local-filesystem"
   });
 });
 
@@ -65,15 +100,13 @@ function requireApiKey(req, res, next) {
 }
 
 // ---- Save package ----
-app.post("/api/packages", requireApiKey, (req, res) => {
+app.post("/api/packages", requireApiKey, async (req, res) => {
   const pkg = req.body;
 
-  // Validate body is an object
   if (!pkg || typeof pkg !== "object" || Array.isArray(pkg)) {
     return res.status(400).json({ ok: false, message: "Request body must be a JSON object." });
   }
 
-  // Validate against schema (strip extra fields, don't reject — just warn)
   const valid = validate(pkg);
   if (!valid) {
     const errors = (validate.errors || []).map(e => ({
@@ -94,32 +127,58 @@ app.post("/api/packages", requireApiKey, (req, res) => {
     package: pkg
   };
 
-  const packages = loadPackages();
-  packages.push(record);
-  savePackages(packages);
-
-  res.status(201).json({ ok: true, ...record });
+  try {
+    if (useKV) {
+      await savePackageKv(record);
+    } else {
+      const packages = loadPackagesFs();
+      packages.push(record);
+      savePackagesFs(packages);
+    }
+    res.status(201).json({ ok: true, ...record });
+  } catch (err) {
+    console.error("Save failed:", err);
+    res.status(500).json({ ok: false, message: "Failed to save package." });
+  }
 });
 
 // ---- Get latest package ----
-app.get("/api/packages/latest", (_req, res) => {
-  const packages = loadPackages();
-  if (packages.length === 0) {
-    return res.status(404).json({ ok: false, message: "No saved packages yet." });
+app.get("/api/packages/latest", async (_req, res) => {
+  try {
+    let latest;
+    if (useKV) {
+      latest = await getLatestPackageKv();
+    } else {
+      const packages = loadPackagesFs();
+      latest = packages.length > 0 ? packages[packages.length - 1] : null;
+    }
+
+    if (!latest) {
+      return res.status(404).json({ ok: false, message: "No saved packages yet." });
+    }
+    res.json({ ok: true, ...latest });
+  } catch (err) {
+    console.error("Load latest failed:", err);
+    res.status(500).json({ ok: false, message: "Failed to load package." });
   }
-  const latest = packages[packages.length - 1];
-  res.json({ ok: true, ...latest });
 });
 
 // ---- List all packages ----
-app.get("/api/packages", (_req, res) => {
-  const packages = loadPackages();
-  res.json({ ok: true, items: packages });
+app.get("/api/packages", async (_req, res) => {
+  try {
+    const items = useKV ? await getAllPackagesKv() : loadPackagesFs();
+    res.json({ ok: true, items });
+  } catch (err) {
+    console.error("List packages failed:", err);
+    res.status(500).json({ ok: false, message: "Failed to list packages." });
+  }
 });
 
+// ---- Start (local only) ----
 if (!isVercel) {
   app.listen(PORT, () => {
     console.log(`Wildlife Documentary Engine running on http://localhost:${PORT}`);
+    console.log(`Storage: ${useKV ? "Vercel KV" : "local filesystem"}`);
   });
 }
 

@@ -37,13 +37,24 @@ Follow the prompts:
 
 Vercel gives you a URL like `https://wildlife-gpt-backend.vercel.app`.
 
-Set your API key as a Vercel environment variable:
+Set environment variables on Vercel:
 
 ```bash
 vercel env add ACTION_API_KEY
+vercel env add KV_REST_API_URL
+vercel env add KV_REST_API_TOKEN
 ```
 
-Paste your secret key. Or do it in the Vercel dashboard: Settings → Environment Variables.
+Paste each value when prompted. Or do it in the Vercel dashboard: Settings → Environment Variables.
+
+Required variables:
+| Variable | Description |
+|---|---|
+| `ACTION_API_KEY` | Secret key protecting the save endpoint |
+| `KV_REST_API_URL` | Upstash Redis REST URL (from Vercel KV integration) |
+| `KV_REST_API_TOKEN` | Upstash Redis REST token (from Vercel KV integration) |
+
+To get KV credentials: go to Vercel dashboard → Storage → your KV database → copy `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
 
 Redeploy with env vars:
 
@@ -147,10 +158,10 @@ After saving successfully, reply:
 - [ ] `gpt-action-openapi.yaml` is valid OpenAPI 3.1.0
 - [ ] No OpenAI API key required anywhere
 
-## Data persistence note
+## Data persistence
 
-- **Vercel**: Packages stored in-memory (`/tmp`). Survives warm function instances (minutes to hours on free tier). Cold starts reset to empty. For permanent storage, add Vercel KV later.
-- **Local**: Packages stored in `data/packages.json` on disk. Fully persistent.
+- **Vercel + KV**: Packages stored in Vercel KV (Upstash Redis). Fully persistent across deployments and cold starts. Requires `KV_REST_API_URL` and `KV_REST_API_TOKEN` env vars.
+- **Local dev**: Packages stored in `data/packages.json` on disk when KV env vars aren't set.
 
 ## No OpenAI API Key
 
