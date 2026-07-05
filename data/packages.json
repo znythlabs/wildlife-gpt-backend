@@ -1,0 +1,50 @@
+[
+  {
+    "id": "pkg_2Re7sTb2eIR1",
+    "createdAt": "2026-07-05T16:38:18.388Z",
+    "package": {
+      "episode_title": "The Secret Life of the Aye-Aye",
+      "animal": "Aye-aye",
+      "hook": "This tiny mammal hunts faster than the human eye can follow.",
+      "summary": "A short cinematic wildlife documentary episode about how the star-nosed mole uses its strange nose as a biological radar system to hunt in complete darkness.",
+      "runtime": "60 seconds",
+      "scenes": [
+        {
+          "scene_number": 1,
+          "duration": "5s",
+          "narration": "Beneath the wet soil of North America, a creature searches in total darkness.",
+          "on_screen_text": "A hunter below ground",
+          "image_prompt": "BBC Earth style macro wildlife documentary shot, wet underground tunnel, star-nosed mole moving through dark soil, natural textures, cinematic lighting, no humans",
+          "video_prompt": "5-second macro wildlife documentary shot, star-nosed mole moving through a damp underground tunnel, subtle handheld camera feel, shallow depth of field, no humans",
+          "camera_style": "Macro close-up, shallow depth of field, slow push-in feeling",
+          "sound_design": "Low soil movement, soft rumble, quiet underground ambience"
+        },
+        {
+          "scene_number": 2,
+          "duration": "6s",
+          "narration": "Its nose is not just strange. It is one of the fastest touch organs in the animal kingdom.",
+          "on_screen_text": "A living radar",
+          "image_prompt": "Extreme macro shot of star-nosed mole nose tentacles, wet pink sensory rays, dark natural background, high-detail wildlife documentary style",
+          "video_prompt": "6-second extreme macro wildlife shot, sensory rays twitching rapidly as the mole scans the tunnel floor, cinematic natural lighting, no humans",
+          "camera_style": "Extreme macro detail shot, locked camera, intense focus on the nose",
+          "sound_design": "Tiny clicks, soft organic movement, subtle tension pulse"
+        }
+      ],
+      "thumbnail_prompt": "Cinematic macro thumbnail of a star-nosed mole emerging from dark wet soil, strange nose clearly visible, dramatic documentary lighting, high detail, no text",
+      "caption": "This mole hunts with a living radar hidden beneath the soil.",
+      "hashtags": [
+        "#Wildlife",
+        "#NatureDocumentary",
+        "#AnimalFacts",
+        "#StarNosedMole",
+        "#Science"
+      ],
+      "metadata": {
+        "tone": "Cinematic wildlife documentary",
+        "format": "9:16 vertical short-form video",
+        "style": "BBC Earth inspired macro realism",
+        "target_platform": "TikTok, Reels, YouTube Shorts"
+      }
+    }
+  }
+]

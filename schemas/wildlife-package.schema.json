@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Wildlife Documentary Episode Package",
+  "type": "object",
+  "required": [
+    "episode_title",
+    "animal",
+    "hook",
+    "summary",
+    "runtime",
+    "scenes",
+    "thumbnail_prompt",
+    "caption",
+    "hashtags",
+    "metadata"
+  ],
+  "properties": {
+    "episode_title": {
+      "type": "string"
+    },
+    "animal": {
+      "type": "string"
+    },
+    "hook": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "runtime": {
+      "type": "string"
+    },
+    "scenes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "scene_number",
+          "duration",
+          "narration",
+          "on_screen_text",
+          "image_prompt",
+          "video_prompt",
+          "camera_style",
+          "sound_design"
+        ],
+        "properties": {
+          "scene_number": {
+            "type": "integer"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "narration": {
+            "type": "string"
+          },
+          "on_screen_text": {
+            "type": "string"
+          },
+          "image_prompt": {
+            "type": "string"
+          },
+          "video_prompt": {
+            "type": "string"
+          },
+          "camera_style": {
+            "type": "string"
+          },
+          "sound_design": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "thumbnail_prompt": {
+      "type": "string"
+    },
+    "caption": {
+      "type": "string"
+    },
+    "hashtags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "tone",
+        "format",
+        "style",
+        "target_platform"
+      ],
+      "properties": {
+        "tone": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "style": {
+          "type": "string"
+        },
+        "target_platform": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wildlife Documentary Engine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #0a0e17;
+      --surface: #111827;
+      --surface2: #161e2d;
+      --border: #1e2d45;
+      --border-soft: #25324a;
+      --text: #e4ebf5;
+      --text-muted: #8896ab;
+      --text-dim: #5c6b82;
+      --orange: #f08a4b;
+      --orange-soft: #f08a4b22;
+      --orange-glow: #f08a4b40;
+      --green: #4ade80;
+      --red: #f87171;
+      --red-soft: #f8717122;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --sidebar-w: 370px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: linear-gradient(135deg, #080c14 0%, #0d1320 50%, #0a101b 100%);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    aside {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    aside h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    aside h1 span { color: var(--orange); }
+
+    aside .desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 4px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin-top: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 13px;
+      font-family: var(--font);
+      transition: border-color 0.15s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px var(--orange-soft);
+    }
+
+    textarea { min-height: 68px; resize: vertical; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 11px 16px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: var(--font);
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: #0a0e17;
+    }
+    .btn-primary:hover { background: #f5995b; }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: #1c2638; }
+
+    .btn-sm {
+      font-size: 11px;
+      padding: 5px 10px;
+      width: auto;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-row .btn { flex: 1; }
+
+    /* MAIN */
+    main {
+      flex: 1;
+      padding: 28px 32px;
+      overflow-y: auto;
+    }
+
+    /* STATUS BAR */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.ready  { background: var(--text-dim); }
+    .status-dot.active { background: var(--orange); box-shadow: 0 0 6px var(--orange-glow); }
+    .status-dot.loaded { background: var(--green); box-shadow: 0 0 6px #4ade8040; }
+    .status-dot.error  { background: var(--red); }
+
+    /* EMPTY STATE */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
+      text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      color: var(--text-dim);
+      min-height: 300px;
+    }
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.4;
+    }
+    .empty-state p { font-size: 15px; max-width: 360px; line-height: 1.6; }
+    .empty-state .hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    .card h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--orange);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    /* BADGES */
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .badge.orange { background: var(--orange-soft); border-color: var(--orange-glow); color: var(--orange); }
+
+    /* SCENE CARDS */
+    .scene-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+    .scene-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .scene-number {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--orange);
+    }
+    .scene-duration {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+    .scene-field {
+      margin-bottom: 10px;
+    }
+    .scene-field .field-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+      margin-bottom: 3px;
+    }
+    .scene-field .field-value {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* PROMPT BLOCKS */
+    .prompt-block {
+      background: #0a0f1a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .prompt-block pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      font-family: var(--font);
+      margin: 0;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .prompt-block .prompt-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--orange);
+      margin-bottom: 6px;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: var(--font);
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--orange); }
+    .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+    /* HASHTAGS */
+    .hashtags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .hashtag {
+      font-size: 12px;
+      font-weight: 500;
+      color: #7fb4e0;
+    }
+
+    /* ERROR */
+    .error-box {
+      background: var(--red-soft);
+      border: 1px solid var(--red);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      color: #fca5a5;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .error-box strong { color: var(--red); }
+    .error-box ul { margin: 8px 0 0 18px; }
+    .error-box li { margin-bottom: 4px; }
+
+    /* RESPONSIVE */
+    @media (max-width: 860px) {
+      body { flex-direction: column; }
+      aside {
+        width: 100%; min-width: 100%; max-width: 100%;
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      main { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>Wildlife<span> Documentary</span> Engine</h1>
+    <p class="desc">AI-powered cinematic wildlife episode packaging. Build once, render everywhere.</p>
+
+    <div class="section-label">Configuration</div>
+
+    <label for="animalInput">Animal / Topic</label>
+    <input id="animalInput" placeholder="e.g. aye-aye, harpy eagle, marine iguana" />
+
+    <label for="episodeType">Episode Type</label>
+    <select id="episodeType">
+      <option value="auto">Auto-pick strongest structure</option>
+      <option value="strange_hunting_method">Strange Hunting Method</option>
+      <option value="impossible_survival">Impossible Survival</option>
+      <option value="silent_predator">Silent Predator</option>
+      <option value="bizarre_body_tool">Bizarre Body Tool</option>
+      <option value="extreme_evolution_trick">Extreme Evolution Trick</option>
+    </select>
+
+    <label for="length">Length</label>
+    <select id="length">
+      <option value="30-40 seconds">30-40 seconds</option>
+      <option value="45-60 seconds" selected>45-60 seconds</option>
+      <option value="60-90 seconds">60-90 seconds</option>
+    </select>
+
+    <label for="visualStyle">Visual Style</label>
+    <textarea id="visualStyle">cinematic viral wildlife documentary, vertical 9:16, macro animal footage, natural habitat realism, shallow depth of field, dramatic documentary lighting</textarea>
+
+    <label for="extraRequirements">Extra Requirements</label>
+    <textarea id="extraRequirements" placeholder="e.g. no gore, safe for students"></textarea>
+
+    <button class="btn btn-primary" onclick="createGptPrompt()">Create GPT Prompt</button>
+
+    <div class="section-label">Generated JSON</div>
+
+    <label for="jsonInput">Paste JSON from Custom GPT</label>
+    <textarea id="jsonInput" placeholder="Paste the JSON output from your Wildlife Documentary Engine Custom GPT..."></textarea>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="previewJson()">Preview JSON</button>
+      <button class="btn btn-secondary" onclick="loadSampleJson()">Load Sample</button>
+    </div>
+    <button class="btn btn-secondary" onclick="clearJson()">Clear JSON</button>
+
+    <div class="section-label">Auto Preview</div>
+
+    <div class="btn-row">
+      <button id="autoPreviewBtn" class="btn btn-secondary" onclick="startAutoPreview()">Start Auto Preview</button>
+      <button class="btn btn-secondary" onclick="loadLatestPackage()">Load Latest</button>
+    </div>
+    <button class="btn btn-secondary" onclick="savePastedJson()">Save Pasted JSON</button>
+  </aside>
+
+  <main>
+    <div id="statusBar" class="status-bar">
+      <span class="status-dot ready"></span>
+      <span id="statusText">Ready</span>
+    </div>
+
+    <div id="autoPreviewStatus" style="display:none;padding:8px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);">
+      Auto Preview: <span id="autoPreviewMsg">Waiting for Custom GPT output...</span>
+    </div>
+
+    <div id="output" class="empty-state">
+      <div class="icon">🎬</div>
+      <p>Create a GPT prompt or load a Wildlife Documentary JSON package to preview it here.</p>
+      <p class="hint">Step 1: Configure &rarr; Step 2: Copy prompt to Custom GPT &rarr; Step 3: Paste JSON &rarr; Step 4: Preview</p>
+    </div>
+  </main>
+
+  <script>
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function copyText(el, text) {
+      if (!navigator.clipboard) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      } else {
+        navigator.clipboard.writeText(text);
+      }
+      if (el) {
+        el.classList.add("copied");
+        el.textContent = "Copied!";
+        setTimeout(() => { el.classList.remove("copied"); el.textContent = "Copy"; }, 1500);
+      }
+    }
+
+    function setStatus(state, text) {
+      const dot = document.querySelector(".status-dot");
+      const txt = document.getElementById("statusText");
+      dot.className = "status-dot " + state;
+      txt.textContent = text;
+    }
+
+    function showError(message) {
+      document.getElementById("output").className = "";
+      document.getElementById("output").innerHTML = '<div class="error-box">' + message + '</div>';
+      setStatus("error", "Error");
+    }
+
+    function validatePackage(pkg) {
+      const missing = [];
+      const requiredTop = ["episode_title","animal","hook","summary","runtime","scenes","thumbnail_prompt","caption","hashtags","metadata"];
+      for (const key of requiredTop) {
+        if (!(key in pkg) || pkg[key] === null || pkg[key] === undefined || (typeof pkg[key] === "string" && pkg[key].trim() === "" && key !== "hashtags")) {
+          missing.push("Top-level: " + key);
+        }
+      }
+      if (pkg.scenes && !Array.isArray(pkg.scenes)) {
+        missing.push("scenes must be an array");
+      } else if (Array.isArray(pkg.scenes)) {
+        if (pkg.scenes.length === 0) missing.push("scenes must have at least 1 entry");
+        pkg.scenes.forEach((scene, i) => {
+          const req = ["scene_number","duration","narration","image_prompt","video_prompt"];
+          for (const key of req) {
+            if (!(key in scene) || scene[key] === null || scene[key] === undefined) {
+              missing.push("scenes[" + i + "]." + key);
+            }
+          }
+        });
+      }
+      if (pkg.metadata && typeof pkg.metadata === "object") {
+        ["tone","format","style","target_platform"].forEach(key => {
+          if (!(key in pkg.metadata) || pkg.metadata[key] === null || pkg.metadata[key] === undefined) {
+            missing.push("metadata." + key);
+          }
+        });
+      }
+      if (pkg.hashtags && !Array.isArray(pkg.hashtags)) {
+        missing.push("hashtags must be an array");
+      }
+      return missing;
+    }
+
+    function renderMissingFields(missing) {
+      if (missing.length === 0) return "";
+      return '<div class="error-box"><strong>Validation Warning — missing fields:</strong><ul>'
+        + missing.map(m => '<li>' + escapeHtml(m) + '</li>').join("")
+        + '</ul><p style="margin-top:8px;font-size:12px;color:#fca5a5;">Preview rendered anyway. Correct these fields in the Custom GPT for full compliance.</p></div>';
+    }
+
+    function renderPackage(pkg) {
+      const missing = validatePackage(pkg);
+      const warnHtml = renderMissingFields(missing);
+      const scenes = pkg.scenes || [];
+      const meta = pkg.metadata || {};
+      const hashtags = pkg.hashtags || [];
+
+      document.getElementById("output").className = "";
+      document.getElementById("output").innerHTML = warnHtml + `
+        <section class="card">
+          <h2>🎬 Episode Overview</h2>
+          <h3>${escapeHtml(pkg.episode_title || "Untitled")}</h3>
+          <p style="font-size:14px;color:var(--text-muted);margin:4px 0 12px;">${escapeHtml(pkg.animal || "")}</p>
+          <div class="badge-row">
+            <span class="badge orange">⏱ ${escapeHtml(pkg.runtime || "")}</span>
+            <span class="badge">${escapeHtml(meta.tone || "")}</span>
+            <span class="badge">${escapeHtml(meta.format || "")}</span>
+            <span class="badge">${escapeHtml(meta.style || "")}</span>
+            <span class="badge">${escapeHtml(meta.target_platform || "")}</span>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>🪝 Hook</h2>
+          <p style="font-size:15px;line-height:1.6;color:var(--text);">${escapeHtml(pkg.hook || "")}</p>
+        </section>
+
+        <section class="card">
+          <h2>📖 Summary</h2>
+          <p style="font-size:14px;line-height:1.7;color:var(--text-muted);">${escapeHtml(pkg.summary || "")}</p>
+        </section>
+
+        <section class="card">
+          <h2>🎞 Scenes</h2>
+          ${scenes.map(scene => `
+            <div class="scene-card">
+              <div class="scene-header">
+                <span class="scene-number">Scene ${escapeHtml(scene.scene_number)}</span>
+                <span class="scene-duration">${escapeHtml(scene.duration)}</span>
+              </div>
+              <div class="scene-field">
+                <div class="field-label">Narration</div>
+                <div class="field-value">${escapeHtml(scene.narration || "")}</div>
+              </div>
+              <div class="scene-field">
+                <div class="field-label">On-Screen Text</div>
+                <div class="field-value">${escapeHtml(scene.on_screen_text || "")}</div>
+              </div>
+              <div class="scene-field">
+                <div class="field-label">Camera Style</div>
+                <div class="field-value" style="color:var(--text-muted);">${escapeHtml(scene.camera_style || "")}</div>
+              </div>
+              <div class="scene-field">
+                <div class="field-label">Sound Design</div>
+                <div class="field-value" style="color:var(--text-muted);">${escapeHtml(scene.sound_design || "")}</div>
+              </div>
+              <div class="prompt-block">
+                <div class="prompt-label">Image Prompt <button class="copy-btn" onclick="copyText(this,'${(scene.image_prompt || "").replaceAll("\\","\\\\").replaceAll("'","\\'")}')">Copy</button></div>
+                <pre>${escapeHtml(scene.image_prompt || "")}</pre>
+              </div>
+              <div class="prompt-block">
+                <div class="prompt-label">Video Prompt <button class="copy-btn" onclick="copyText(this,'${(scene.video_prompt || "").replaceAll("\\","\\\\").replaceAll("'","\\'")}')">Copy</button></div>
+                <pre>${escapeHtml(scene.video_prompt || "")}</pre>
+              </div>
+            </div>
+          `).join("")}
+        </section>
+
+        <section class="card">
+          <h2>🖼 Thumbnail Prompt <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this,'${(pkg.thumbnail_prompt || "").replaceAll("\\","\\\\").replaceAll("'","\\'")}')">Copy</button></h2>
+          <div class="prompt-block" style="margin-top:12px;">
+            <pre>${escapeHtml(pkg.thumbnail_prompt || "")}</pre>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>📱 Social Export <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this,'${(pkg.caption || "").replaceAll("\\","\\\\").replaceAll("'","\\'")}')">Copy Caption</button></h2>
+          <p style="font-size:14px;line-height:1.6;color:var(--text);margin-bottom:10px;">${escapeHtml(pkg.caption || "")}</p>
+          <div class="hashtags">
+            ${hashtags.map(h => '<span class="hashtag">' + escapeHtml(h) + '</span>').join("")}
+          </div>
+        </section>
+      `;
+
+      setStatus(missing.length ? "active" : "loaded",
+        missing.length ? "JSON Loaded (" + missing.length + " warnings)" : "JSON Loaded");
+    }
+
+    function createGptPrompt() {
+      const animal = document.getElementById("animalInput").value.trim();
+      const episodeType = document.getElementById("episodeType").value;
+      const length = document.getElementById("length").value;
+      const visualStyle = document.getElementById("visualStyle").value.trim();
+      const extraRequirements = document.getElementById("extraRequirements").value.trim();
+
+      if (!animal) {
+        showError("<strong>Animal / Topic is required.</strong>");
+        setStatus("error", "Missing animal/topic");
+        return;
+      }
+
+      const prompt = [
+        "Generate a full Wildlife Documentary Engine package as STRICT valid JSON only.",
+        "",
+        "RULES:",
+        "- Do NOT use markdown.",
+        "- Do NOT wrap the JSON in code fences.",
+        "- Do NOT include commentary before or after the JSON.",
+        "- Return ONLY the JSON object — nothing else.",
+        "",
+        "INPUTS:",
+        "Animal / Topic: " + animal,
+        "Episode Type: " + episodeType,
+        "Length: " + length,
+        "Visual Style: " + visualStyle,
+        extraRequirements ? "Extra Requirements: " + extraRequirements : "",
+        "",
+        "REQUIRED JSON SHAPE (every field mandatory):",
+        JSON.stringify({
+          episode_title: "",
+          animal: "",
+          hook: "",
+          summary: "",
+          runtime: "",
+          scenes: [{
+            scene_number: 1,
+            duration: "",
+            narration: "",
+            on_screen_text: "",
+            image_prompt: "",
+            video_prompt: "",
+            camera_style: "",
+            sound_design: ""
+          }],
+          thumbnail_prompt: "",
+          caption: "",
+          hashtags: [],
+          metadata: {
+            tone: "",
+            format: "",
+            style: "",
+            target_platform: ""
+          }
+        }, null, 2)
+      ].filter(Boolean).join("\n");
+
+      document.getElementById("output").className = "";
+      document.getElementById("output").innerHTML = `
+        <section class="card">
+          <h2>GPT Prompt <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this, ${JSON.stringify(JSON.stringify(prompt))})">Copy GPT Prompt</button></h2>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Copy this into your Wildlife Documentary Engine Custom GPT, then paste the returned JSON back here.</p>
+          <div class="prompt-block">
+            <pre>${escapeHtml(prompt)}</pre>
+          </div>
+        </section>
+      `;
+
+      setStatus("active", "Prompt Created");
+    }
+
+    function previewJson() {
+      const raw = document.getElementById("jsonInput").value.trim();
+      if (!raw) {
+        showError("<strong>No JSON found.</strong> Paste JSON from your Custom GPT first.");
+        setStatus("error", "No JSON input");
+        return;
+      }
+      try {
+        const pkg = JSON.parse(raw);
+        renderPackage(pkg);
+      } catch (e) {
+        showError("<strong>Invalid JSON.</strong><br>Check for markdown fences, trailing commas, or extra text.<br><br><em>" + escapeHtml(e.message) + "</em>");
+        setStatus("error", "Invalid JSON");
+      }
+    }
+
+    function clearJson() {
+      document.getElementById("jsonInput").value = "";
+      document.getElementById("output").className = "empty-state";
+      document.getElementById("output").innerHTML = `
+        <div class="icon">🎬</div>
+        <p>Create a GPT prompt or load a Wildlife Documentary JSON package to preview it here.</p>
+        <p class="hint">Step 1: Configure &rarr; Step 2: Copy prompt to Custom GPT &rarr; Step 3: Paste JSON &rarr; Step 4: Preview</p>
+      `;
+      document.getElementById("animalInput").value = "";
+      setStatus("ready", "Ready");
+    }
+
+    async function loadSampleJson() {
+      try {
+        const res = await fetch("./examples/sample-output.json");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const pkg = await res.json();
+        document.getElementById("jsonInput").value = JSON.stringify(pkg, null, 2);
+        renderPackage(pkg);
+      } catch (e) {
+        if (e.message.startsWith("HTTP")) {
+          showError("<strong>Cannot load sample.</strong><br>" + escapeHtml(e.message));
+        } else {
+          showError("<strong>Sample loading requires running the project through a local server, not opening the HTML file directly.</strong><br><br><em>Try: <code>npx serve .</code> or <code>python -m http.server 8000</code></em>");
+        }
+        setStatus("error", "Sample load failed");
+      }
+    }
+
+    // ---- Auto Preview ----
+    let autoPreviewTimer = null;
+    let currentPackageId = null;
+
+    function startAutoPreview() {
+      if (autoPreviewTimer) return stopAutoPreview();
+      autoPreviewTimer = setInterval(pollLatestPackage, 3000);
+      document.getElementById("autoPreviewStatus").style.display = "block";
+      document.getElementById("autoPreviewMsg").textContent = "Waiting for Custom GPT output...";
+      document.getElementById("autoPreviewBtn").textContent = "Stop Auto Preview";
+      document.getElementById("autoPreviewBtn").style.background = "var(--green)";
+      document.getElementById("autoPreviewBtn").style.color = "#0a0e17";
+      setStatus("active", "Auto Preview On");
+      // Do an immediate poll
+      pollLatestPackage();
+    }
+
+    function stopAutoPreview() {
+      if (autoPreviewTimer) { clearInterval(autoPreviewTimer); autoPreviewTimer = null; }
+      document.getElementById("autoPreviewStatus").style.display = "none";
+      document.getElementById("autoPreviewBtn").textContent = "Start Auto Preview";
+      document.getElementById("autoPreviewBtn").style.background = "";
+      document.getElementById("autoPreviewBtn").style.color = "";
+      setStatus("ready", "Auto Preview OFF");
+    }
+
+    async function pollLatestPackage() {
+      const msgEl = document.getElementById("autoPreviewMsg");
+      try {
+        const res = await fetch("/api/packages/latest");
+        if (!res.ok) {
+          if (res.status === 404) {
+            msgEl.textContent = "Waiting for Custom GPT output...";
+            msgEl.style.color = "var(--text-muted)";
+            return;
+          }
+          throw new Error("HTTP " + res.status);
+        }
+        const data = await res.json();
+        if (data.ok && data.id !== currentPackageId) {
+          currentPackageId = data.id;
+          document.getElementById("jsonInput").value = JSON.stringify(data.package, null, 2);
+          renderPackage(data.package);
+          msgEl.textContent = "New package loaded automatically! (" + data.id + ")";
+          msgEl.style.color = "var(--green)";
+          setStatus("loaded", "New package received");
+        }
+      } catch (e) {
+        msgEl.textContent = "Backend unavailable.";
+        msgEl.style.color = "var(--red)";
+      }
+    }
+
+    async function loadLatestPackage() {
+      try {
+        const res = await fetch("/api/packages/latest");
+        if (!res.ok) {
+          if (res.status === 404) {
+            showError("<strong>No saved packages yet.</strong><br>Generate one via the Custom GPT or save a pasted JSON first.");
+            setStatus("error", "No packages");
+            return;
+          }
+          throw new Error("HTTP " + res.status);
+        }
+        const data = await res.json();
+        if (data.ok) {
+          currentPackageId = data.id;
+          document.getElementById("jsonInput").value = JSON.stringify(data.package, null, 2);
+          renderPackage(data.package);
+          setStatus("loaded", "Package loaded: " + data.id);
+        }
+      } catch (e) {
+        showError("<strong>Backend unavailable.</strong><br>" + escapeHtml(e.message));
+        setStatus("error", "Backend unavailable");
+      }
+    }
+
+    async function savePastedJson() {
+      const raw = document.getElementById("jsonInput").value.trim();
+      if (!raw) {
+        showError("<strong>No JSON to save.</strong><br>Paste a JSON package first.");
+        setStatus("error", "Nothing to save");
+        return;
+      }
+      let pkg;
+      try { pkg = JSON.parse(raw); } catch (e) {
+        showError("<strong>Invalid JSON.</strong><br>" + escapeHtml(e.message));
+        setStatus("error", "Invalid JSON");
+        return;
+      }
+      try {
+        const res = await fetch("/api/packages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(pkg)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          const errList = (data.errors || []).map(e => e.path + ": " + e.message).join("<br>");
+          showError("<strong>Validation failed.</strong><br>" + escapeHtml(data.message) + (errList ? "<br><br>" + errList : ""));
+          setStatus("error", "Validation failed");
+          return;
+        }
+        currentPackageId = data.id;
+        renderPackage(data.package);
+        setStatus("loaded", "Package saved: " + data.id);
+      } catch (e) {
+        showError("<strong>Backend unavailable.</strong><br>" + escapeHtml(e.message));
+        setStatus("error", "Backend unavailable");
+      }
+    }
+
+    // Auto-load sample on page load
+    document.addEventListener("DOMContentLoaded", function () {
+      loadSampleJson();
+    });
+  </script>
+</body>
+</html>
