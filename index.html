@@ -447,7 +447,13 @@
         .replaceAll("'", "&#039;");
     }
 
+
     function copyText(el, text) {
+      if (text === undefined) {
+        const container = el.closest(".prompt-block") || el.closest(".card") || el.closest("section");
+        const elm = container && (container.querySelector("pre") || container.querySelector("p"));
+        text = elm ? elm.textContent : "";
+      }
       if (!navigator.clipboard) {
         const ta = document.createElement("textarea");
         ta.value = text;
@@ -577,11 +583,11 @@
                 <div class="field-value" style="color:var(--text-muted);">${escapeHtml(scene.sound_design || "")}</div>
               </div>
               <div class="prompt-block">
-                <div class="prompt-label">Image Prompt <button class="copy-btn" onclick="copyText(this,'${(scene.image_prompt || "").replaceAll("\\","\\\\").replaceAll("'","\\'")}')">Copy</button></div>
+                <div class="prompt-label">Image Prompt <button class="copy-btn" onclick="copyText(this)">Copy</button></div>
                 <pre>${escapeHtml(scene.image_prompt || "")}</pre>
               </div>
               <div class="prompt-block">
-                <div class="prompt-label">Video Prompt <button class="copy-btn" onclick="copyText(this,'${(scene.video_prompt || "").replaceAll("\\","\\\\").replaceAll("'","\\'")}')">Copy</button></div>
+                <div class="prompt-label">Video Prompt <button class="copy-btn" onclick="copyText(this)">Copy</button></div>
                 <pre>${escapeHtml(scene.video_prompt || "")}</pre>
               </div>
             </div>
@@ -589,14 +595,14 @@
         </section>
 
         <section class="card">
-          <h2>🖼 Thumbnail Prompt <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this,'${(pkg.thumbnail_prompt || "").replaceAll("\\","\\\\").replaceAll("'","\\'")}')">Copy</button></h2>
+          <h2>🖼 Thumbnail Prompt <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this)">Copy</button></h2>
           <div class="prompt-block" style="margin-top:12px;">
             <pre>${escapeHtml(pkg.thumbnail_prompt || "")}</pre>
           </div>
         </section>
 
         <section class="card">
-          <h2>📱 Social Export <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this,'${(pkg.caption || "").replaceAll("\\","\\\\").replaceAll("'","\\'")}')">Copy Caption</button></h2>
+          <h2>📱 Social Export <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this)">Copy Caption</button></h2>
           <p style="font-size:14px;line-height:1.6;color:var(--text);margin-bottom:10px;">${escapeHtml(pkg.caption || "")}</p>
           <div class="hashtags">
             ${hashtags.map(h => '<span class="hashtag">' + escapeHtml(h) + '</span>').join("")}
@@ -669,7 +675,7 @@
       document.getElementById("output").className = "";
       document.getElementById("output").innerHTML = `
         <section class="card">
-          <h2>GPT Prompt <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this, ${JSON.stringify(JSON.stringify(prompt))})">Copy GPT Prompt</button></h2>
+          <h2>GPT Prompt <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this)">Copy GPT Prompt</button></h2>
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Copy this into your Wildlife Documentary Engine Custom GPT, then paste the returned JSON back here.</p>
           <div class="prompt-block">
             <pre>${escapeHtml(prompt)}</pre>
