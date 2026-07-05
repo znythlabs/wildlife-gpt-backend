@@ -6,7 +6,7 @@ import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { nanoid } from "nanoid";
 import Ajv from "ajv";
-import { kv } from "@vercel/kv";
+import { createClient } from "@vercel/kv";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const isVercel = !!process.env.VERCEL;
@@ -14,6 +14,15 @@ const useKV = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 const PORT = process.env.PORT || 3000;
 const ACTION_API_KEY = process.env.ACTION_API_KEY || "change_this_to_a_secret_key";
 const SCHEMA_FILE = resolve(__dirname, "schemas", "wildlife-package.schema.json");
+
+// KV client — explicit automaticDeserialization: false so we control JSON.parse
+const kv = useKV
+  ? createClient({
+      url: process.env.KV_REST_API_URL,
+      token: process.env.KV_REST_API_TOKEN,
+      automaticDeserialization: false
+    })
+  : null;
 
 // KV key namespace
 const KV_LATEST = "wildlife:packages:latest";
@@ -39,7 +48,8 @@ function savePackagesFs(packages) {
 
 // ---- KV helpers ----
 async function savePackageKv(record) {
-  await kv.set(kvKey(record.id), JSON.stringify(record));
+  const json = JSON.stringify(record);
+  await kv.set(kvKey(record.id), json);
   await kv.set(KV_LATEST, record.id);
   await kv.lpush(KV_INDEX, record.id);
 }
@@ -48,7 +58,8 @@ async function getLatestPackageKv() {
   const id = await kv.get(KV_LATEST);
   if (!id) return null;
   const raw = await kv.get(kvKey(id));
-  return raw ? JSON.parse(raw) : null;
+  if (!raw) return null;
+  return typeof raw === "string" ? JSON.parse(raw) : raw;
 }
 
 async function getAllPackagesKv() {
@@ -56,7 +67,9 @@ async function getAllPackagesKv() {
   const items = [];
   for (const id of ids) {
     const raw = await kv.get(kvKey(id));
-    if (raw) items.push(JSON.parse(raw));
+    if (raw) {
+      items.push(typeof raw === "string" ? JSON.parse(raw) : raw);
+    }
   }
   return items;
 }
@@ -86,7 +99,10 @@ app.get("/api/health", (_req, res) => {
     service: "wildlife-documentary-engine",
     mode: "custom-gpt-action-storage",
     status: "ready",
-    storage: useKV ? "vercel-kv" : "local-filesystem"
+    storage: useKV ? "vercel-kv" : "local-filesystem",
+    hasActionKey: !!process.env.ACTION_API_KEY && process.env.ACTION_API_KEY !== "change_this_to_a_secret_key",
+    hasKvUrl: !!process.env.KV_REST_API_URL,
+    hasKvToken: !!process.env.KV_REST_API_TOKEN
   });
 });
 
@@ -135,10 +151,10 @@ app.post("/api/packages", requireApiKey, async (req, res) => {
       packages.push(record);
       savePackagesFs(packages);
     }
-    res.status(201).json({ ok: true, ...record });
+    res.status(201).json({ ok: true, id: record.id, createdAt: record.createdAt, package: record.package });
   } catch (err) {
-    console.error("Save failed:", err);
-    res.status(500).json({ ok: false, message: "Failed to save package." });
+    console.error("Save package failed:", err);
+    res.status(500).json({ ok: false, error: "Internal server error", message: "Failed to save package." });
   }
 });
 
@@ -156,10 +172,10 @@ app.get("/api/packages/latest", async (_req, res) => {
     if (!latest) {
       return res.status(404).json({ ok: false, message: "No saved packages yet." });
     }
-    res.json({ ok: true, ...latest });
+    res.json({ ok: true, id: latest.id, createdAt: latest.createdAt, package: latest.package });
   } catch (err) {
-    console.error("Load latest failed:", err);
-    res.status(500).json({ ok: false, message: "Failed to load package." });
+    console.error("Load latest package failed:", err);
+    res.status(500).json({ ok: false, error: "Internal server error", message: "Failed to load latest package." });
   }
 });
 
@@ -170,7 +186,7 @@ app.get("/api/packages", async (_req, res) => {
     res.json({ ok: true, items });
   } catch (err) {
     console.error("List packages failed:", err);
-    res.status(500).json({ ok: false, message: "Failed to list packages." });
+    res.status(500).json({ ok: false, error: "Internal server error", message: "Failed to list packages." });
   }
 });
 
