@@ -1299,29 +1299,102 @@
         }
       };
 
-      const prompt = [
-        "Generate a full Wildlife Documentary Engine package as strict valid JSON only.",
-        "",
-        "Rules:",
-        "- Return only JSON.",
-        "- Do not use markdown.",
-        "- Do not wrap the JSON in code fences.",
-        "- Do not include commentary before or after the JSON.",
-        "- Use schema_version \"2.0\".",
-        "- Do not add extra fields.",
-        "- Make every prompt generation-ready.",
-        "- Make it cinematic, factual, student-safe, and suitable for short-form vertical video.",
-        "",
-        "Inputs:",
-        "Animal / Topic: " + animal,
-        "Episode Type: " + episodeType,
-        "Length: " + length,
-        "Visual Style: " + visualStyle,
-        extraRequirements ? "Extra Requirements: " + extraRequirements : "",
-        "",
-        "Required JSON shape:",
-        JSON.stringify(shape, null, 2)
-      ].filter(Boolean).join("\n");
+      const prompt = `
+Generate one complete Wildlife Documentary Engine package for this topic:
+
+ANIMAL / TOPIC:
+${animal}
+
+EPISODE TYPE:
+${episodeType}
+
+TARGET LENGTH:
+${length}
+
+VISUAL STYLE:
+${visualStyle}
+
+EXTRA REQUIREMENTS:
+${extraRequirements || "None"}
+
+OUTPUT RULES:
+- Use schema_version "2.0".
+- Return strict valid JSON only.
+- Do not use markdown.
+- Do not wrap the JSON in code fences.
+- Do not add commentary before or after the JSON.
+- Do not add extra fields outside the schema.
+- Every required field must be filled.
+- Do not leave empty strings.
+- Do not use placeholder text.
+- Make the package ready for production.
+
+CONTENT STYLE:
+- Create a cinematic short-form wildlife documentary package.
+- Make the opening hook strong, strange, and curiosity-driven.
+- Keep the story factual, clear, student-safe, and non-gory.
+- Use natural-history documentary pacing.
+- Use BBC Earth-inspired cinematic realism, but do not claim BBC affiliation.
+- Make it suitable for TikTok, Instagram Reels, and YouTube Shorts.
+- Use vertical 9:16 short-form pacing.
+- Prefer macro wildlife footage, telephoto wildlife shots, natural habitat realism, dramatic natural lighting, shallow depth of field, and cinematic scene progression.
+- Do not include humans unless the topic absolutely requires it.
+
+STRUCTURE REQUIREMENTS:
+- Use 7 to 10 scenes depending on the selected length.
+- VO Script must be in a separate vo_script section.
+- Storyboard must be in a separate storyboard section.
+- Image and video prompts must be in image_video_prompts.
+- Do not put narration inside storyboard panels.
+- Do not put on-screen text inside the scene prompts.
+- Each scene must have matching scene_number and duration across vo_script.lines, storyboard.panels, and image_video_prompts.
+
+QA SCORE:
+- Score the package honestly from 0 to 100.
+- overall_score should reflect hook strength, story structure, visual clarity, factuality, and pacing.
+- Add short notes explaining any weaknesses or improvements.
+
+VO SCRIPT:
+- full_script must contain the complete voiceover script in one clean copy-ready block.
+- lines must break the script by scene.
+- Each voiceover line should be short, cinematic, and easy to narrate.
+- Avoid overly long sentences.
+
+STORYBOARD:
+- storyboard_copy_prompt must be one complete copy-ready prompt for generating a consistent storyboard sheet.
+- It should mention consistent animal appearance, consistent habitat, clean panel borders, cinematic documentary layout, no logos, no watermark, and no unnecessary text.
+- panels must describe visual beats only.
+- Each panel must include visual_beat, subject_action, environment, camera_style, lighting, composition, and consistency_notes.
+
+IMAGE AND VIDEO PROMPTS:
+- Each image_prompt must be ready for image generation.
+- Each video_prompt must be ready for video generation.
+- Prompts must include subject, environment, camera style, lighting, motion, and visual realism.
+- Every prompt should avoid humans unless required.
+- Every negative_prompt should prevent: text, watermark, logo, extra animals, distorted anatomy, gore, blood, humans, cartoon style, low quality, blurry subject.
+
+THUMBNAIL:
+- thumbnail_prompt.prompt must be cinematic, clear, high-contrast, and curiosity-driven.
+- Do not include text in the thumbnail image.
+- The animal or key visual mystery must be obvious.
+
+SOCIAL EXPORT:
+- caption must be short and viral.
+- hashtags must be relevant.
+- title_options must include at least 5 options.
+- description must be YouTube Shorts/Reels ready.
+- keywords must be SEO-friendly.
+
+REQUIRED JSON SHAPE:
+${JSON.stringify(shape, null, 2)}
+
+After generating the final valid JSON package, call the saveWildlifePackage action and send the complete JSON object.
+
+Only call saveWildlifePackage after the JSON is complete and matches schema_version "2.0".
+
+After saving successfully, reply only:
+Saved. Preview should update automatically.
+`.trim();
 
       document.getElementById("output").className = "";
       document.getElementById("output").innerHTML = `
