@@ -38,8 +38,12 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
-// Serve static frontend
-app.use(express.static(__dirname));
+// Serve frontend: read index.html at startup (Vercel-safe, no __dirname reliance)
+const INDEX_HTML = readFileSync(resolve(__dirname, "index.html"), "utf8");
+const SAMPLE_JSON = readFileSync(resolve(__dirname, "examples", "sample-output.json"), "utf8");
+
+app.get("/", (_req, res) => { res.type("html").send(INDEX_HTML); });
+app.get("/examples/sample-output.json", (_req, res) => { res.type("json").send(SAMPLE_JSON); });
 
 // ---- Health ----
 app.get("/api/health", (_req, res) => {
