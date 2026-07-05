@@ -7,8 +7,8 @@ info:
     structured JSON so the preview frontend can display it instantly.
   version: "1.0.0"
 servers:
-  - url: "https://YOUR-PUBLIC-BACKEND-URL-HERE"
-    description: Replace with your Vercel deployment URL (or ngrok/cloudflared tunnel)
+  - url: "https://content-generator-sage.vercel.app"
+    description: Wildlife Documentary Engine — Vercel deployment
 
 security:
   - ApiKeyAuth: []

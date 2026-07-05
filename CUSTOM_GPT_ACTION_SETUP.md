@@ -55,7 +55,7 @@ Update `gpt-action-openapi.yaml` — replace the server URL:
 
 ```yaml
 servers:
-  - url: "https://wildlife-gpt-backend.vercel.app"   # ← your Vercel URL
+  - url: "https://content-generator-sage.vercel.app"   # ← your Vercel URL
 ```
 
 Skip to **Step 5** below.
