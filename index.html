@@ -1319,15 +1319,15 @@ ${extraRequirements || "None"}
 
 OUTPUT RULES:
 - Use schema_version "2.0".
-- Return strict valid JSON only.
-- Do not use markdown.
-- Do not wrap the JSON in code fences.
-- Do not add commentary before or after the JSON.
+- Build one complete strict valid JSON object that matches the required schema.
 - Do not add extra fields outside the schema.
 - Every required field must be filled.
 - Do not leave empty strings.
 - Do not use placeholder text.
 - Make the package ready for production.
+- After the JSON object is complete, send the full JSON object to the saveWildlifePackage action.
+- Do not show the JSON in chat unless the saveWildlifePackage action fails or is unavailable.
+- After saving successfully, reply only: Saved. Preview should update automatically.
 
 CONTENT STYLE:
 - Create a cinematic short-form wildlife documentary package.
@@ -1387,13 +1387,6 @@ SOCIAL EXPORT:
 
 REQUIRED JSON SHAPE:
 ${JSON.stringify(shape, null, 2)}
-
-After generating the final valid JSON package, call the saveWildlifePackage action and send the complete JSON object.
-
-Only call saveWildlifePackage after the JSON is complete and matches schema_version "2.0".
-
-After saving successfully, reply only:
-Saved. Preview should update automatically.
 `.trim();
 
       document.getElementById("output").className = "";
