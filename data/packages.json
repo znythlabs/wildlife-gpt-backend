@@ -46,5 +46,50 @@
         "target_platform": "TikTok, Reels, YouTube Shorts"
       }
     }
+  },
+  {
+    "id": "pkg_1783275608104_AbJfkSIb",
+    "createdAt": "2026-07-05T18:20:08.105Z",
+    "package": {
+      "animal": "Test Ocelot",
+      "episode_title": "The Phantom Pattern",
+      "hook": "A ghost walks the jungle floor.",
+      "summary": "The ocelot's silent hunting mastery.",
+      "runtime": "60 seconds",
+      "caption": "Nature's perfect camouflage.",
+      "thumbnail_prompt": "Ocelot in dappled light",
+      "hashtags": [
+        "#ocelot",
+        "#wildlife"
+      ],
+      "metadata": {
+        "tone": "Mysterious",
+        "format": "9:16",
+        "style": "Cinematic",
+        "target_platform": "YouTube"
+      },
+      "scenes": [
+        {
+          "scene_number": 1,
+          "duration": "20s",
+          "narration": "In the shadow-dappled forests of South America...",
+          "on_screen_text": "South American Rainforest",
+          "image_prompt": "Ocelot stepping through jungle shadows, dappled light on spotted coat",
+          "video_prompt": "Tracking shot following ocelot through underbrush",
+          "camera_style": "Tracking, eye level",
+          "sound_design": "Rustling leaves, distant birdsong"
+        },
+        {
+          "scene_number": 2,
+          "duration": "40s",
+          "narration": "Its rosette pattern dissolves into the filtered light...",
+          "on_screen_text": "The Phantom Revealed",
+          "image_prompt": "Ocelot frozen mid-step, camouflage pattern blending with light spots on forest floor",
+          "video_prompt": "Slow push-in as ocelot becomes nearly invisible against patterned background",
+          "camera_style": "Slow dolly in, shallow depth of field",
+          "sound_design": "Heartbeat, suspenseful ambient"
+        }
+      ]
+    }
   }
 ]

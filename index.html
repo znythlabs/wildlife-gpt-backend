@@ -363,6 +363,115 @@
       }
       main { padding: 20px; }
     }
+
+    /* 2-COLUMN PREVIEW GRID */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .preview-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+    }
+    .full-width { grid-column: 1 / -1; }
+
+    /* PROMPT GRID (image/video side by side) */
+    .prompt-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .prompt-grid .prompt-block { margin-bottom: 0; }
+
+    /* VO SCRIPT */
+    .vo-scene {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .vo-scene:last-child { border-bottom: none; }
+    .vo-scene .vo-scene-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .vo-scene .vo-scene-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* STORYBOARD PANEL */
+    .storyboard-scene {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .storyboard-scene:last-child { border-bottom: none; }
+    .storyboard-scene .sb-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .storyboard-scene .sb-detail {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .storyboard-scene .sb-detail span {
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    /* QA SCORE */
+    .qa-placeholder {
+      color: var(--text-dim);
+      font-style: italic;
+      font-size: 13px;
+      padding: 8px 0;
+    }
+    .qa-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .qa-metric {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .qa-metric .qa-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--orange);
+    }
+    .qa-metric .qa-label {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+    }
+
+    /* COMPACT CARD */
+    .card.compact { padding: 16px 20px; }
+
+    /* RESPONSIVE OVERRIDES */
+    @media (max-width: 860px) {
+      .preview-grid { grid-template-columns: 1fr; }
+      .prompt-grid { grid-template-columns: 1fr; }
+      .qa-metrics { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -450,9 +559,13 @@
 
     function copyText(el, text) {
       if (text === undefined) {
-        const container = el.closest(".prompt-block") || el.closest(".card") || el.closest("section");
-        const elm = container && (container.querySelector("pre") || container.querySelector("p"));
-        text = elm ? elm.textContent : "";
+        if (el && el.dataset.copyText !== undefined) {
+          text = el.dataset.copyText;
+        } else {
+          const container = el.closest(".prompt-block") || el.closest(".card") || el.closest("section");
+          const elm = container && (container.querySelector("pre") || container.querySelector("p"));
+          text = elm ? elm.textContent : "";
+        }
       }
       if (!navigator.clipboard) {
         const ta = document.createElement("textarea");
@@ -466,9 +579,11 @@
         navigator.clipboard.writeText(text);
       }
       if (el) {
+        const original = el.textContent;
+        const label = el.dataset.copyLabel || "";
         el.classList.add("copied");
-        el.textContent = "Copied!";
-        setTimeout(() => { el.classList.remove("copied"); el.textContent = "Copy"; }, 1500);
+        el.textContent = label ? "Copied " + label + "!" : "Copied!";
+        setTimeout(() => { el.classList.remove("copied"); el.textContent = original; }, 1500);
       }
     }
 
@@ -532,15 +647,44 @@
       const scenes = pkg.scenes || [];
       const meta = pkg.metadata || {};
       const hashtags = pkg.hashtags || [];
+      const qa = pkg.qa || null;
+      const episodeTitle = pkg.episode_title || "Untitled";
+
+      // Build VO Script text
+      const voScriptText = scenes.map(s =>
+        "Scene " + (s.scene_number || "?") + " \u2014 " + (s.duration || "?") + "\n" + (s.narration || "")
+      ).join("\n\n");
+
+      // Build Storyboard prompt
+      const storyboardPrompt = [
+        "Create a clean cinematic storyboard sheet for " + episodeTitle + ", vertical wildlife documentary style, consistent subject, consistent visual style.",
+        ""
+      ].concat(scenes.map((s, i) =>
+        "Panel " + (i + 1) + ":\n" + (s.image_prompt || "") + "\nCamera: " + (s.camera_style || "cinematic")
+      )).concat([
+        "",
+        "Design rules:",
+        "- consistent animal appearance",
+        "- consistent habitat",
+        "- no humans",
+        "- no text overlays unless required",
+        "- clean panel borders",
+        "- professional documentary storyboard layout"
+      ]).join("\n");
+
+      // Build social export combined text
+      const hashtagsText = hashtags.join(" ");
+      const socialExportText = (pkg.caption || "") + "\n\n" + hashtagsText;
 
       document.getElementById("output").className = "";
       document.getElementById("output").innerHTML = warnHtml + `
-        <section class="card">
-          <h2>🎬 Episode Overview</h2>
-          <h3>${escapeHtml(pkg.episode_title || "Untitled")}</h3>
+        <!-- FULL WIDTH: Episode Overview -->
+        <section class="card full-width">
+          <h2>Episode Overview</h2>
+          <h3>${escapeHtml(episodeTitle)}</h3>
           <p style="font-size:14px;color:var(--text-muted);margin:4px 0 12px;">${escapeHtml(pkg.animal || "")}</p>
           <div class="badge-row">
-            <span class="badge orange">⏱ ${escapeHtml(pkg.runtime || "")}</span>
+            <span class="badge orange">${escapeHtml(pkg.runtime || "")}</span>
             <span class="badge">${escapeHtml(meta.tone || "")}</span>
             <span class="badge">${escapeHtml(meta.format || "")}</span>
             <span class="badge">${escapeHtml(meta.style || "")}</span>
@@ -548,64 +692,96 @@
           </div>
         </section>
 
-        <section class="card">
-          <h2>🪝 Hook</h2>
-          <p style="font-size:15px;line-height:1.6;color:var(--text);">${escapeHtml(pkg.hook || "")}</p>
-        </section>
+        <div class="preview-grid">
+          <!-- LEFT COLUMN -->
+          <div class="preview-col">
+            <section class="card compact">
+              <h2>Hook</h2>
+              <p style="font-size:15px;line-height:1.6;color:var(--text);">${escapeHtml(pkg.hook || "")}</p>
+            </section>
 
-        <section class="card">
-          <h2>📖 Summary</h2>
-          <p style="font-size:14px;line-height:1.7;color:var(--text-muted);">${escapeHtml(pkg.summary || "")}</p>
-        </section>
+            <section class="card compact">
+              <h2>Summary</h2>
+              <p style="font-size:14px;line-height:1.7;color:var(--text-muted);">${escapeHtml(pkg.summary || "")}</p>
+            </section>
 
-        <section class="card">
-          <h2>🎞 Scenes</h2>
-          ${scenes.map(scene => `
-            <div class="scene-card">
-              <div class="scene-header">
-                <span class="scene-number">Scene ${escapeHtml(scene.scene_number)}</span>
-                <span class="scene-duration">${escapeHtml(scene.duration)}</span>
-              </div>
-              <div class="scene-field">
-                <div class="field-label">Narration</div>
-                <div class="field-value">${escapeHtml(scene.narration || "")}</div>
-              </div>
-              <div class="scene-field">
-                <div class="field-label">On-Screen Text</div>
-                <div class="field-value">${escapeHtml(scene.on_screen_text || "")}</div>
-              </div>
-              <div class="scene-field">
-                <div class="field-label">Camera Style</div>
-                <div class="field-value" style="color:var(--text-muted);">${escapeHtml(scene.camera_style || "")}</div>
-              </div>
-              <div class="scene-field">
-                <div class="field-label">Sound Design</div>
-                <div class="field-value" style="color:var(--text-muted);">${escapeHtml(scene.sound_design || "")}</div>
-              </div>
-              <div class="prompt-block">
-                <div class="prompt-label">Image Prompt <button class="copy-btn" onclick="copyText(this)">Copy</button></div>
-                <pre>${escapeHtml(scene.image_prompt || "")}</pre>
-              </div>
-              <div class="prompt-block">
-                <div class="prompt-label">Video Prompt <button class="copy-btn" onclick="copyText(this)">Copy</button></div>
-                <pre>${escapeHtml(scene.video_prompt || "")}</pre>
-              </div>
-            </div>
-          `).join("")}
-        </section>
+            <section class="card compact">
+              <h2>QA Score</h2>
+              ${qa ? `
+                <div class="qa-metrics">
+                  ${Object.entries(qa).map(([k, v]) => `
+                    <div class="qa-metric">
+                      <div class="qa-value">${escapeHtml(String(v))}</div>
+                      <div class="qa-label">${escapeHtml(k)}</div>
+                    </div>
+                  `).join("")}
+                </div>
+              ` : `
+                <p class="qa-placeholder">QA score not included in this package yet.</p>
+              `}
+            </section>
 
-        <section class="card">
-          <h2>🖼 Thumbnail Prompt <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this)">Copy</button></h2>
-          <div class="prompt-block" style="margin-top:12px;">
-            <pre>${escapeHtml(pkg.thumbnail_prompt || "")}</pre>
+            <section class="card compact">
+              <h2>VO Script <button class="btn btn-sm btn-secondary" style="float:right" data-copy-label="VO Script" onclick="copyText(this)">Copy VO Script</button></h2>
+              <pre style="background:none;padding:0;border:none;font-size:13px;line-height:1.6;white-space:pre-wrap;max-height:400px;overflow-y:auto;font-family:var(--font);margin:0;">${escapeHtml(voScriptText)}</pre>
+            </section>
           </div>
-        </section>
 
-        <section class="card">
-          <h2>📱 Social Export <button class="btn btn-sm btn-secondary" style="float:right" onclick="copyText(this)">Copy Caption</button></h2>
-          <p style="font-size:14px;line-height:1.6;color:var(--text);margin-bottom:10px;">${escapeHtml(pkg.caption || "")}</p>
-          <div class="hashtags">
-            ${hashtags.map(h => '<span class="hashtag">' + escapeHtml(h) + '</span>').join("")}
+          <!-- RIGHT COLUMN -->
+          <div class="preview-col">
+            <section class="card compact">
+              <h2>Storyboard <button class="btn btn-sm btn-secondary" style="float:right" data-copy-label="Storyboard Prompt" onclick="copyText(this)">Copy Storyboard Prompt</button></h2>
+              ${scenes.map((s, i) => `
+                <div class="storyboard-scene">
+                  <div class="sb-header">Panel ${i + 1} &mdash; ${escapeHtml(s.duration || "?")} | ${escapeHtml(s.camera_style || "cinematic")}</div>
+                  <div class="sb-detail">
+                    <span>Sound:</span> ${escapeHtml(s.sound_design || "\u2014")}<br>
+                    <span>Visual:</span> ${escapeHtml((s.image_prompt || "").substring(0, 120))}${(s.image_prompt || "").length > 120 ? "..." : ""}
+                  </div>
+                </div>
+              `).join("")}
+              <details style="margin-top:12px;">
+                <summary style="font-size:12px;color:var(--text-muted);cursor:pointer;">Storyboard Prompt (click to expand)</summary>
+                <pre style="margin-top:8px;font-size:12px;line-height:1.5;max-height:200px;overflow-y:auto;">${escapeHtml(storyboardPrompt)}</pre>
+              </details>
+            </section>
+
+            <section class="card compact">
+              <h2>Thumbnail Prompt <button class="btn btn-sm btn-secondary" style="float:right" data-copy-label="Thumbnail Prompt" onclick="copyText(this)">Copy</button></h2>
+              <div class="prompt-block" style="margin-top:12px;">
+                <pre>${escapeHtml(pkg.thumbnail_prompt || "")}</pre>
+              </div>
+            </section>
+
+            <section class="card compact">
+              <h2>Social Export</h2>
+              <p style="font-size:14px;line-height:1.6;color:var(--text);margin-bottom:10px;">${escapeHtml(pkg.caption || "")}</p>
+              <div class="hashtags">
+                ${hashtags.map(h => '<span class="hashtag">' + escapeHtml(h) + '</span>').join("")}
+              </div>
+              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-sm btn-secondary" data-copy-label="Caption" onclick="copyText(this)">Copy Caption</button>
+                <button class="btn btn-sm btn-secondary" data-copy-label="Hashtags" data-copy-text="${escapeHtml(hashtagsText)}" onclick="copyText(this)">Copy Hashtags</button>
+                <button class="btn btn-sm btn-secondary" data-copy-label="Social Export" data-copy-text="${escapeHtml(socialExportText)}" onclick="copyText(this)">Copy Social Export</button>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- FULL WIDTH: Image & Video Prompts -->
+        <section class="card full-width">
+          <h2>Image & Video Prompts</h2>
+          <div class="prompt-grid">
+            ${scenes.map(s => `
+              <div class="prompt-block">
+                <div class="prompt-label">Scene ${escapeHtml(s.scene_number)} &mdash; ${escapeHtml(s.duration)} | Image Prompt <button class="copy-btn" data-copy-label="Image Prompt" onclick="copyText(this)">Copy</button></div>
+                <pre>${escapeHtml(s.image_prompt || "")}</pre>
+              </div>
+              <div class="prompt-block">
+                <div class="prompt-label">Scene ${escapeHtml(s.scene_number)} &mdash; ${escapeHtml(s.duration)} | Video Prompt <button class="copy-btn" data-copy-label="Video Prompt" onclick="copyText(this)">Copy</button></div>
+                <pre>${escapeHtml(s.video_prompt || "")}</pre>
+              </div>
+            `).join("")}
           </div>
         </section>
       `;
